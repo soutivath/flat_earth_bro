@@ -35,17 +35,21 @@ const fileName = (req, file, cb) => {
 
 const profileStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, `${__dirname}/public/images/resources/profile_images`);
+    let dir = `${appDir}/public/images/resources/profile_images`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+    req.files[0].floderName = dir;
+    
+  }
+
+  cb(null, dir);
+
+
   },
   filename: fileName,
 });
 
-const billStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, `${__dirname}/public/images/resources/bills_images`);
-  },
-  filename: fileName,
-});
+
 
 const testStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -74,6 +78,18 @@ const roomStorage = multer.diskStorage({
   },
   filename: fileName,
 });
+const billStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let dir = `${appDir}/public/images/resources/bills/`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+      req.files[0].fullFolderName = dir;
+    }
+
+    cb(null, dir);
+  },
+  filename: fileName,
+});
 
 
 
@@ -90,7 +106,7 @@ const updateRoomStorage = multer.diskStorage({
       let dir= `${appDir}/public/images/resources/room/${room.images_path}//`;
       //cb(null, dir);
       if (!fs.existsSync(dir)) {
-        cb(createError(400, 'Floder path does not exist'),null)
+        cb(createError(400, 'Floder path does not exist'),null);
       }
     cb(null, dir);
 
@@ -109,7 +125,7 @@ export const profileUpload = multer({
   fileFilter: fileFilter,
 });
 export const billUpload = multer({
-  storage: profileStorage,
+  storage: billStorage,
   fileFilter: fileFilter,
 });
 export const roomUpload = multer({

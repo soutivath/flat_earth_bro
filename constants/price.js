@@ -1,4 +1,11 @@
-export default {
-    TRASH_PRICE: 10000,
-    ROOM_PRICE: 1000000,
+let trashPrice = 10000;
+
+exports.getTrashPrice = ()=>{
+    return trashPrice;
 }
+
+exports.setTrashPrice = (trashPrice)=>{
+    this.trashPrice = trashPrice;
+}
+
+

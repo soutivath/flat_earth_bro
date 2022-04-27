@@ -2,6 +2,7 @@
 
 import { profileStorage as uploader } from '../middlewares/multer';
 
+
 ///----------admin
 import authRouteAdmin from "./admin/authentication.Route";
 import billRouteAdmin from "./admin/bill.Route";
@@ -15,24 +16,29 @@ import userRouteAdmin from "./admin/user.Route";
 
 //------------------user
 import authRouteUser from "./user/authentication.Route";
-import profileRouteUser from "./user/authentication.Route";
+import profileRouteUser from "./user/profile.Route";
 import rentingRouteUser from "./user/renting.Route";
 import testRoute from "./test.Route";
 // //-------------------->
+
+//middlewares
+
+import { Auth } from '../middlewares/auth.guard';
+import {isAdmin} from '../middlewares/isAdmin.guard;'
  const app = express();
 
-app.use("/admin",authRouteAdmin);
-app.use("/admin",billRouteAdmin);
-app.use("/admin",notificationRouteAdmin);
-app.use("/admin",rentingRouteAdmin);
-app.use("/admin",roomRouteAdmin);
-app.use("/admin",trashRouteAdmin);
-app.use("/admin",typeRouteAdmin);
-app.use("/admin",userRouteAdmin);
+app.use("/admin",[Auth,isAdmin],authRouteAdmin);
+app.use("/admin",[Auth,isAdmin],billRouteAdmin);
+app.use("/admin",[Auth,isAdmin],notificationRouteAdmin);
+app.use("/admin",[Auth,isAdmin],rentingRouteAdmin);
+app.use("/admin",[Auth,isAdmin],roomRouteAdmin);
+app.use("/admin",[Auth,isAdmin],trashRouteAdmin);
+app.use("/admin",[Auth,isAdmin],typeRouteAdmin);
+app.use("/admin",[Auth,isAdmin],userRouteAdmin);
 
-app.use("/user",authRouteUser);
-app.use("/user",profileRouteUser);
-//app.use("/user",rentingRouteUser);
-app.use("/test",testRoute);
+app.use("/user",[Auth],authRouteUser);
+app.use("/user",[Auth],profileRouteUser);
+app.use("/user",[Auth],rentingRouteUser);
+app.use("/test",[Auth],testRoute);
 
 module.exports = app;

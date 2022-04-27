@@ -16,15 +16,15 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.RentingDetail,{foreignKey: 'renting_id'});
       this.belongsTo(models.Room,{foreignKey: 'room_id'});
       
-      this.hasMany(models.Bill,{foreignKey: 'bill_id'});
+      this.hasMany(models.Bill,{foreignKey: 'renting_id'});
     }
   }
   Renting.init({
     room_id: DataTypes.INTEGER,
-    start_date: DataTypes.DATE,
-    end_date: DataTypes.DATE,
-    active:DataTypes.BOOLEAN,
-
+    start_renting_date: DataTypes.DATE,
+    end_renting_date: DataTypes.DATE,
+    is_active:DataTypes.BOOLEAN,
+    deposit:DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Renting',

@@ -1,4 +1,4 @@
 export default{
-    FIRE:"fire",
+    ELECTRIC:"electric",
     WATER:"water",
 }

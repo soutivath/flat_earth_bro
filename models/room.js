@@ -1,4 +1,7 @@
 'use strict';
+const { dirname } = require("path");
+const appDir = dirname(require.main.filename);
+
 const {
   Model
 } = require('sequelize');
@@ -24,5 +27,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Room',
   });
+  Room.prototype.getRoomPath = function(){
+    return `${appDir}/public/images/resources/room/${this.images_path}`;
+  }
+  Room.prototype.checkActive = function(){
+    return !!this.is_active;
+  }
   return Room;
 };

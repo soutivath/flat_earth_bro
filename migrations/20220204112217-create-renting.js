@@ -29,7 +29,10 @@ module.exports = {
         allowNull: false,
         type:Sequelize.BOOLEAN
       },
-      
+      deposit:{
+        allowNull: false,
+        type:Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

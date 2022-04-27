@@ -17,7 +17,7 @@ module.exports = {
         allowNull: false,
       },
       bill_type: {
-        type:Sequelize.ENUM("fire","water"),
+        type:Sequelize.ENUM("electric","water"),
         allowNull: false,
       },
       is_pay:{
@@ -34,6 +34,15 @@ module.exports = {
       is_user_read:{
         type:Sequelize.BOOLEAN,
         allowNull: false,
+      },
+      pay_by:{
+        type:Sequelize.INTEGER,
+        allownull: true,
+        references:{
+          model:"users",
+          key:"id",
+          onDelete:"SET NULL"
+        }
       },
       createdAt: {
         allowNull: false,

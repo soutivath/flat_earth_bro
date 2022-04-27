@@ -11,5 +11,5 @@ export const updateRoomUploadSchema = Joi.object({
     "name":Joi.string().required(),
     "price":Joi.number().integer().required(),
     "type_id":Joi.number().integer().required(),
-    "delete_image":Joi.array().items(Joi.string()).required()
+    "delete_image":Joi.array().items(Joi.string())
 });

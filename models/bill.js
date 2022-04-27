@@ -12,19 +12,28 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
+
+     this.belongsTo(models.User,{foreignKey: 'is_pay'});
     }
   }
   Bill.init({
   
     image_path:DataTypes.STRING,
     price:DataTypes.INTEGER,
-    bill_type:DataTypes.ENUM("fire","water"),
+    bill_type:DataTypes.ENUM("electric","water"),
     is_pay:DataTypes.BOOLEAN,
     renting_id:DataTypes.INTEGER,
     is_user_read:DataTypes.BOOLEAN,
+    pay_by:DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Bill',
   });
+
+  Bill.prototype.getImagePath = function nice(){
+    const appDir = dirname(require.main.filename);
+    let dir = `${appDir}/public/images/resources/bills/${image_path}`;
+    return dir
+  }
   return Bill;
 };

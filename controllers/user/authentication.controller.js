@@ -7,8 +7,12 @@ import JWT from "../../libs/utils/authenticate";
 import GLOBAL_TOPIC from "../../constants/notificationTopic";
 const firebase = require('firebase-admin');
 exports.register = async (req, res, next) => {
+    let imageProfile = "default_profile.png";
     const t = await sequelize.transaction();
     try{
+        if(req.files[0]){
+            imageProfile = req.files[0].filename; 
+        }
         const validatedResult = await registerUserSchema.validateAsync(req.body);
         const user = await User.find({ 
             where:{
@@ -42,7 +46,10 @@ exports.register = async (req, res, next) => {
         //--------------------------->
         const hashPassword = hashPassword(validatedResult.password);
         const updatedUserPassword = await User.update({ 
-            "password":hashPassword
+            "password":hashPassword,
+            "image":imageProfile,
+            "uid":uid,
+            "display_name":validateResult.display_name
         },
         {
             where:{
@@ -71,6 +78,7 @@ exports.register = async (req, res, next) => {
         const accessToken = JWT.genAccessJWT(payload);
         const refreshToken = JWT.genRefreshJWT(payload);
 
+        await t.commit();
         return res.status(200).json({
             success: true,
             message:"Register successfully",
@@ -80,6 +88,12 @@ exports.register = async (req, res, next) => {
         
 
     }catch(err){
+        await t.rollback();
+        try {
+            fs.unlinkSync(
+            req.files[0].path
+            );
+          } catch (err) {}
         next(err);
     }
 }
@@ -118,7 +132,7 @@ exports.login = async (req,res,next) => {
                 "data":[]
             });
         }
-        if(user.phoneNumber==null){
+        if(user.password==null){
             return res.status(400).json({
                 "message":"This phone number saved in our record but not registered",
                 "success":false,
@@ -147,6 +161,7 @@ exports.login = async (req,res,next) => {
 
         
     }catch(err){
+        await t.rollback();
         if (err.isJoi === true) error.status = 422;
         next(err);
     }

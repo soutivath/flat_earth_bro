@@ -1,4 +1,5 @@
 'use strict';
+const { dirname } = require('path');
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('RentingDetails', {
@@ -36,6 +37,24 @@ module.exports = {
       renting_pay_amount:{
         type:Sequelize.INTEGER,
         allowNull: true,
+      },
+      trash_pay_by:{
+        type:Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model:"users",
+          onDelete:"SET NULL",
+          key:"id"
+        }
+      },
+      renting_pay_by:{
+        type:Sequelize.INTEGER,
+        allowNull: true,
+        references:{
+          model:"users",
+          onDelete:"SET NULL",
+          key:"id"
+        }
       },
       
       createdAt: {

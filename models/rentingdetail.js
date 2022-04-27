@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
+      this.belongsTo(models.User,{foreignKey: 'trash_pay_by',as:"trash_pay"});
+      this.belongsTo(models.User,{foreignKey: 'renting_pay_by',as:"renting_pay"})
     }
   }
   RentingDetail.init({
@@ -21,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     is_renting_pay:DataTypes.BOOLEAN,
     trash_pay_amount:DataTypes.INTEGER,
     renting_pay_amount:DataTypes.INTEGER,
+    trash_pay_by:DataTypes.INTEGER,
+    renting_pay_by:DataTypes.INTEGER,
+
+
   }, {
     sequelize,
     modelName: 'RentingDetail',
