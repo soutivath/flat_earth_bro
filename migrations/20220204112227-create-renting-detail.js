@@ -19,15 +19,15 @@ module.exports = {
         }
       },
       end_date: {
-        type:Sequelize.DATE,
+        type:Sequelize.DATEONLY,
         allowNull: false,
       },
       is_trash_pay:{
-        type:Sequelize.BOOLEAN,
+        type:Sequelize.ENUM('paid','unpaid','pass'),
         allowNull: false,
       },
       is_renting_pay:{
-        type:Sequelize.BOOLEAN,
+        type:Sequelize.ENUM('paid','unpaid','pass'),
         allowNull: false,
       },
       trash_pay_amount:{

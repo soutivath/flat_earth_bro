@@ -18,9 +18,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   RentingDetail.init({
     renting_id:DataTypes.INTEGER,
-    end_date:DataTypes.DATE,
-    is_trash_pay:DataTypes.BOOLEAN,
-    is_renting_pay:DataTypes.BOOLEAN,
+    end_date:DataTypes.DATEONLY,
+    is_trash_pay:DataTypes.ENUM("paid","unpaid","pass"),
+    is_renting_pay:DataTypes.ENUM("paid","unpaid","pass"),
     trash_pay_amount:DataTypes.INTEGER,
     renting_pay_amount:DataTypes.INTEGER,
     trash_pay_by:DataTypes.INTEGER,

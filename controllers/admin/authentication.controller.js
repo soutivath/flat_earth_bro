@@ -1,6 +1,5 @@
-import { sequelize } from "../../models";
+import { sequelize,User } from "../../models";
 import JWT from "../../libs/utils/authenticate";
-import User from "../../models";
 import {hashPassword,compareHashPassword} from "../../libs/utils/bcrypt";
 import {registerUserSchema,loginUserSchema} from "../../validators/users/authentication.validator";
 import createHttpError from "http-errors";
@@ -10,11 +9,14 @@ exports.login = async (req, res, next) => {
        
         const user = await User.findOne({
             where:{
-                phone_number:validatedResult.phone_number
+                phoneNumber:validatedResult.phoneNumber
             }
         });
         if(!user){
            throw createHttpError(404,"User not found");
+        }
+        if(user.is_admin!=1){
+            throw createHttpError(400,"Only admin can use this function");
         }
         const isPasswordMatch = compareHashPassword(validatedResult.password,user.password);
         if(!isPasswordMatch){
@@ -23,7 +25,10 @@ exports.login = async (req, res, next) => {
 
         const payload = {
             id:user.id,
-            phoneNumber:user.phoneNumber
+            phoneNumber:user.phoneNumber,
+            name:user.name,
+            display_name:user.display_name,
+            is_admin:user.is_admin
         }
 
         const accessToken = JWT.genAccessJWT(payload);

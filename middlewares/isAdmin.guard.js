@@ -1,7 +1,10 @@
 import {User} from '../models';
 export const isAdmin = async(req,res,next)=>{
-    const admin = await user.findByPk(req.user.id);
-    if(admin.isAdmin == 1)
+    if(!req.user){
+        return res.status(401).send({message:"unauth"});
+    }
+   
+    if(req.user.is_admin == 1)
     {
         return next();
     }

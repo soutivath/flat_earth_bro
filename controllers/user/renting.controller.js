@@ -1,6 +1,7 @@
 import { sequelize,UserRenting,Renting,Room,Type} from "../../models";
 import {viewRentingWithDetail} from "../../tranformer/userViewRenting.tranformer";
 import {Op} from "sequelize";
+import createHttpError from "http-errors";
 //get where active
 exports.getCurrentRenting = async (req,res,next)=>{
     try{
@@ -16,6 +17,7 @@ exports.getCurrentRenting = async (req,res,next)=>{
 
             }]
         });
+       
         if (typeof renting == 'undefined' || renting.length <= 0) {
             return res.status(404).json({message:"your data not found in our record",data:[],success:false});
         }
@@ -73,6 +75,12 @@ exports.getRentingDetail = async (req,res,next)=>{
             }]
            
         });
+
+        if(!renting){
+            throw createHttpError(404, "Renting not found or u not rent this room");
+        }
+
+    
 
 
 

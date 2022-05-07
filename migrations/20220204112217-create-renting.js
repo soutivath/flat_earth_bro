@@ -19,11 +19,11 @@ module.exports = {
       },
       start_renting_date:{
         allowNull: false,
-        type:Sequelize.DATE
+        type:Sequelize.DATEONLY
       },
       end_renting_date:{
         allowNull: true,
-        type:Sequelize.DATE
+        type:Sequelize.DATEONLY
       },
       is_active:{
         allowNull: false,

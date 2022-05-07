@@ -1,7 +1,7 @@
 
 var admin = require("firebase-admin");
 const serviceAccount = require("./firebase_key.json");
-const dbUrl = "https://flatpropersal-default-rtdb.asia-southeast1.firebasedatabase.app/";
+const dbUrl = "https://flat-propersal-2022-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
 module.exports = ()=>{
     // firebase.initializeApp({

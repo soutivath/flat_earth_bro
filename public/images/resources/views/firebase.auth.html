@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="recaptcha-container"></div>
+    <h1>Phone auth</h1>
+    <button onclick="signIn()">Get token</button>
+  </body>
+  <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-analytics.js"></script>
+  <script>
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnPImoU1-gai8167VOC-oigP_1MGz-y9A",
+      authDomain: "flatpropersal.firebaseapp.com",
+      databaseURL:
+        "https://flatpropersal-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "flatpropersal",
+      storageBucket: "flatpropersal.appspot.com",
+      messagingSenderId: "330391304866",
+      appId: "1:330391304866:web:fac70e201afcffd8ba35fb",
+      measurementId: "G-MW9DRTDHZV",
+    };
+     firebase.initializeApp(firebaseConfig);
+     firebase.auth().settings.appVerificationDisabledForTesting = true;
+     var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+     var phoneNumber = "+8562052416362";
+      var testVerificationCode = "111111";
+   
+      function signIn(){
+        const user =  firebase
+        .auth()
+        .signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(function (confirmationResult) {
+         return confirmationResult.confirm(testVerificationCode);
+    
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+       
+      }
+
+        
+  </script>
+
+</html>

@@ -28,7 +28,7 @@ exports.post = async(req,res,next)=>{
    
     
     try{
-        const validateResult = await postUpdateSchema.validateAsync(req.params);
+        const validateResult = await postUpdateSchema.validateAsync(req.body);
         const type = await Type.create({
              name:validateResult.name,
              price:validateResult.price
@@ -46,8 +46,8 @@ exports.post = async(req,res,next)=>{
 exports.update = async(req,res,next)=>{
    
     try{
-        const validateResult = await postUpdateSchema.validateAsync(req.params);
-        const type = Type.update({
+        const validateResult = await postUpdateSchema.validateAsync(req.body);
+        const type = await Type.update({
             name:validateResult.name,
             price:validateResult.price
         },{
@@ -55,9 +55,14 @@ exports.update = async(req,res,next)=>{
                 id:req.params.id
             }
         });
+      const updatedType = await Type.findOne({
+          where:{
+              id:req.params.id
+          }
+      });
         return res.status(200).json({
             success:true,
-            data:type
+            data:updatedType
         });
     }catch(err){
         next(err);
@@ -66,14 +71,20 @@ exports.update = async(req,res,next)=>{
 }
 exports.delete = async(req,res,next)=>{
     try{
+        const deletedType = await Type.findOne({
+            where:{
+                id:req.params.id
+            }
+        });
         const type =await Type.destroy({
             where:{
                 id:req.params.id
             }
         });
+        
         return res.status(200).json({
             success:true,
-            data:type
+            data:deletedType
         })
     }catch(err){
         next(err);

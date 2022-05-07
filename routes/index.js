@@ -24,10 +24,10 @@ import testRoute from "./test.Route";
 //middlewares
 
 import { Auth } from '../middlewares/auth.guard';
-import {isAdmin} from '../middlewares/isAdmin.guard;'
+import {isAdmin} from '../middlewares/isAdmin.guard'
  const app = express();
 
-app.use("/admin",[Auth,isAdmin],authRouteAdmin);
+app.use("/admin",authRouteAdmin);
 app.use("/admin",[Auth,isAdmin],billRouteAdmin);
 app.use("/admin",[Auth,isAdmin],notificationRouteAdmin);
 app.use("/admin",[Auth,isAdmin],rentingRouteAdmin);

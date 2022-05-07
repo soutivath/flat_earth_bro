@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Renting.init({
     room_id: DataTypes.INTEGER,
-    start_renting_date: DataTypes.DATE,
-    end_renting_date: DataTypes.DATE,
+    start_renting_date: DataTypes.DATEONLY,
+    end_renting_date: DataTypes.DATEONLY,
     is_active:DataTypes.BOOLEAN,
     deposit:DataTypes.INTEGER
   }, {

@@ -38,6 +38,9 @@ exports.show = async (req, res, next) => {
     let room = await Room.findByPk(validateResult, {
       include: Type,
     });
+    if(!room){
+      throw createHttpError(404, "Room not found");
+    }
     room = await aShowTransformer(room);
     return res.status(200).json({
       success: true,
@@ -64,7 +67,6 @@ exports.post = async (req, res, next) => {
     }
     const room = await Room.create({
       name: validateResult.name,
-      price: validateResult.price,
       images_path: req.files[0].folderName,
       type_id: validateResult.type_id,
     });
@@ -87,7 +89,7 @@ exports.update = async (req, res, next) => {
   try {
     let validateResult = await updateRoomUploadSchema.validateAsync(req.body);
   
-
+let option = {};
     let room = await Room.findOne({
       where:{
         id:req.params.id
@@ -97,10 +99,14 @@ exports.update = async (req, res, next) => {
     if (!room) {
       throw createHttpError(404, "Room not found");
     }
-    const type = await Type.findByPk(validateResult.type_id);
-    if (!type) {
-      throw createHttpError.NotFound("Type not found");
+    if(validateResult.type_id){
+      const type = await Type.findByPk(validateResult.type_id);
+      if (!type) {
+        throw createHttpError.NotFound("Type not found");
+      }
+      option.type_id = type.id;
     }
+    
     let floderNameWithPath = `${appDir}/public/images/resources/room/${room.images_path}`;
     let toDeleteImages = [];
    
@@ -112,22 +118,22 @@ exports.update = async (req, res, next) => {
           sub_image_file_name[sub_image_file_name.length - 1];
         let fullPath = `${floderNameWithPath}/${image_file_name}`;
         if (!fs.existsSync(fullPath)) {
-          cb(createHttpError(404, `${image_path} not found`));
+          throw createHttpError(404, `${image_path} not found`);
         }
         toDeleteImages.push(fullPath);
       }
    
     }
 
+    if(validateResult.name){
+      option.name = validateResult.name;
+    }
 
+   
   
 
     const roomUpdated = await Room.update(
-      {
-        name: validateResult.name,
-        price: validateResult.price,
-        type_id: validateResult.type_id,
-      },
+     option,
       {
         where: {
           id: req.params.id,
@@ -143,9 +149,10 @@ exports.update = async (req, res, next) => {
         }
       }
     }
+    const updatedRoom = await Room.findByPk(req.params.id);
     return res.status(200).json({
       success: true,
-      data: roomUpdated,
+      data: updatedRoom,
     });
   } catch (err) {
     if (req.files[0]) {

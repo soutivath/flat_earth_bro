@@ -12,6 +12,8 @@ import price from "../../constants/price";
 import createHttpError from "http-errors";
 import { payTrashSchema } from "../../validators/admins/trash.validator";
 
+import paidType from "../../constants/paidType";
+
 import { getTrashPrice } from "../../constants/price";
 // count people in renting and calculate price
 exports.payTrash = async (req, res, next) => {
@@ -25,7 +27,7 @@ exports.payTrash = async (req, res, next) => {
 
     if (!renting_detail) createHttpError.NotFound("Renting not found");
 
-    if (renting_detail.is_trash_pay) {
+    if (renting_detail.is_trash_pay==paidType.PAID) {
       throw createHttpError(400, "This record already paid");
     }
 
@@ -35,9 +37,10 @@ exports.payTrash = async (req, res, next) => {
 
     const amountOfPeople = await UserRenting.count({
       where: {
-        renting_id: validationResult.renting_detail_id,
+        renting_id: renting_detail.renting_id,
       },
     });
+    
 
     if (amountOfPeople <= 0) {
       return res
@@ -51,7 +54,7 @@ exports.payTrash = async (req, res, next) => {
 
     await RentingDetail.update(
       {
-        is_trash_pay: true,
+        is_trash_pay: paidType.PAID,
         trash_pay_amount: allTrashPrice,
         trash_pay_by:validationResult.pay_by,
       },

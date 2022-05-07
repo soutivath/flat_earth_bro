@@ -26,7 +26,7 @@ exports.addBill = async (req, res, next) => {
     const validatedResult = await addBillSchema.validateAsync(req.body);
     const checkRenting = await Renting.findByPk(validatedResult.renting_id);
     if (!checkRenting) {
-      throw creaetHttpError(400, "Renting not found");
+      throw createHttpError(400, "Renting not found");
     }
     const newBill = await Bill.create({
       image_path: image.filename,
@@ -58,7 +58,11 @@ exports.payBill = async (req, res, next) => {
   try {
     const validatedResult = await billOperateSchema.validateAsync(req.body);
 
-    const checkBill = await Bill.findByPk(req.params.id);
+    let checkBill = await Bill.findOne({
+      where:{
+        id:req.params.id
+      },plain:true
+    });
 
     if (!checkBill) {
       throw createHttpError(404, "Bill not found");
@@ -66,16 +70,17 @@ exports.payBill = async (req, res, next) => {
     if (checkBill.is_pay) {
       throw createHttpError(400, "Bill is already paid");
     }
-    const checkUser = await User.findOne({
+    let checkUser = await User.findOne({
       where: {
         id: validatedResult.pay_by,
       },
+    
     });
 
     if (!checkUser) {
       throw createHttpError(404, "User not found");
     }
-    const newBill = await Bill.update(
+    await Bill.update(
       {
         is_pay: true,
         pay_by: validatedResult.pay_by,
@@ -86,9 +91,10 @@ exports.payBill = async (req, res, next) => {
         },
       }
     );
-
+    checkBill.is_pay = true;
+    checkBill.pay_by = validatedResult.pay_by;
     return res.status(200).json({
-      data: [],
+      data: checkBill,
       message: "Bill has been paid successfully",
       success: true,
     });
@@ -100,25 +106,31 @@ exports.payBill = async (req, res, next) => {
 exports.updateBill = async (req, res, next) => {
   try {
     const validatedResult = await updateBillSchema.validateAsync(req.body);
-    const checkBill = await Bill.findByPk(req.params.id);
+    let checkBill = await Bill.findOne({where:{
+      id:req.params.id
+    },plain:true});
 
     if (!checkBill) {
       throw createHttpError(404, "Bill not found");
     }
 
     let changeObject = {};
-    if (req.files) {
+    if (req.files[0]) {
+    
       changeObject["image_path"] = req.files[0].filename;
+     
     }
 
     if (validatedResult.price) {
       changeObject["price"] = validatedResult.price;
+      checkBill.price = validatedResult.price;
     }
     if (validatedResult.bill_type) {
       changeObject["bill_type"] = validatedResult.bill_type;
+      checkBill.bill_type = validatedResult.bill_type;
     }
 
-    const newBill = await Bill.update(changeObject, {
+    await Bill.update(changeObject, {
       where: {
         id: req.params.id,
       },
@@ -131,8 +143,13 @@ exports.updateBill = async (req, res, next) => {
       } catch (err) {}
     }
 
+    if(req.files[0]){
+      checkBill.image_path = req.files[0].filename;
+    }
+    
+
     return res.status(200).json({
-      data: newBill,
+      data: checkBill,
       message: "Bill updated successfully",
       success: true,
     });
@@ -140,6 +157,8 @@ exports.updateBill = async (req, res, next) => {
     try {
       fs.unlinkSync(req.files[0].path);
     } catch (err) {}
+
+    
     next(err);
   }
 };
@@ -160,8 +179,9 @@ exports.deleteBill = async (req, res, next) => {
         `${appDir}/public/images/resources/bills/${checkBillExisting.image_path}`
       );
     } catch (err) {}
+   
     await t.commit();
-    return res.status(200).json({ success: true, data: bill });
+    return res.status(200).json({ success: true, data: null });
   } catch (err) {
     await t.rollback();
     next(err);

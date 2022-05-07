@@ -1,3 +1,3 @@
-import passport from './passport';
+import passport from 'passport';
 
 export const Auth = passport.authenticate("jwt",{session:false});

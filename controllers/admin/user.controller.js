@@ -41,6 +41,7 @@ exports.editAdmin = async (req, res, next) => {
                 fs.unlinkSync(profilePath);
               } catch (err) {}
         }
+        await t.commit();
         return res.status(200).json({
             data:updatedUser,
             message:"updated admin successfully",

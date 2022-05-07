@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import moment from "moment";
 import {
   sequelize,
   Renting,
@@ -20,6 +21,7 @@ import {
 } from "../../validators/admins/renting.validator";
 import { Op } from "sequelize";
 import { Bills } from "../../tranformer/bill.tranformer";
+import paidType from "../../constants/paidType";
 
 exports.checkIn = async (req, res, next) => {
   const t = await sequelize.transaction();
@@ -27,19 +29,30 @@ exports.checkIn = async (req, res, next) => {
 
   try {
     const validateResult = await checkInSchema.validateAsync(req.body);
+   // let dateString = date.format(now,"YYYY-MM-DD");
+    //let convertedDate = date.parse(now,"YYYY-MM-DD");
+   
 
+    //return res.send(date.addMonths(, validateResult.months));
     const end_renting_date = date.addMonths(now, validateResult.months);
-
+  
+  
     let room = await Room.findOne({
       where: { id: validateResult.room_id },
+      include:Type
     });
     if (!room) {
       throw createHttpError(404, "Room not found");
     }
 
+    if(room.is_active){
+      throw createHttpError(400,"Room is not available for renting");
+    }
+
     //   if(room.checkActive()){
     //       throw createHttpError(400, "Room is active try to get another room");
     //   }
+
 
     const renting = await Renting.create(
       {
@@ -54,21 +67,67 @@ exports.checkIn = async (req, res, next) => {
       }
     );
 
-    for (let i = 1; i <= validateResult.months; i++) {
+ 
+    let rentingDetailOption = {
+      renting_id: renting.id,
+     
+      is_trash_pay: paidType.UNPAID,
+      is_renting_pay:validateResult.renting_pay==true?paidType.PAID:paidType.UNPAID,
+      trash_pay_amount: 0,
+     
+    };
+
+    
+
+    if(validateResult.renting_pay){
+      rentingDetailOption.renting_pay_amount = room.Type.price;
+      if(validateResult.renting_pay_by){
+        const user = await User.findByPk(validateResult.renting_pay_by);
+        if(!user){
+          throw createHttpError(404,"user not found");
+        }
+        rentingDetailOption.renting_pay_by = validateResult.renting_pay_by;
+
+      }else{
+        throw createHttpError(422,"Please provide a user id");
+      }
+    }
+    else{
+      rentingDetailOption.renting_pay_amount = 0;
+    }
+
+
+    for (let i = 0; i <= validateResult.months; i++) {
+     if(i==validateResult.months){
       await RentingDetail.create(
         {
-          renting_id: renting.id,
           end_date: date.addMonths(now, i),
-          is_trash_pay: false,
-          is_renting_pay: false,
-          trash_pay_amount: 0,
-          renting_pay_amount: 0,
+          renting_id: renting.id,
+        is_trash_pay: paidType.UNPAID,
+       is_renting_pay:paidType.UNPAID,
+         trash_pay_amount: 0,
+          
         },
+         {
+           transaction: t,
+         });
+     }else{
+      await RentingDetail.create(
         {
-          transaction: t,
-        }
-      );
+          end_date: date.addMonths(now, i),
+          ...rentingDetailOption,
+          
+        },
+         {
+           transaction: t,
+         });
+     }
+      
     }
+
+    
+
+
     for (let user_id of validateResult.users_renting) {
       await UserRenting.create(
         {
@@ -157,23 +216,30 @@ exports.payRent = async (req, res, next) => {
    */
 
   const t = await sequelize.transaction();
-  const now = new Date();
+ 
 
   try {
     const validateResult = await payRentSchema.validateAsync(req.body);
-    const end_renting_date = date.addMonths(now, validateResult.months);
-
+   
+  
     const renting_detail = await RentingDetail.findOne({
       where: {
         id: validateResult.renting_detail_id,
       },
+      include:Renting,
     });
+   
+
 
     if (!renting_detail)
       throw createHttpError.NotFound("No renting detail found");
-    if (renting_detail.is_renting_pay == true)
+
+
+
+    if (renting_detail.is_renting_pay==paidType.PAID)
       throw createHttpError(400, "This bill already paid");
 
+    
     const renting = await Renting.findOne({
       where: {
         id: renting_detail.renting_id,
@@ -186,37 +252,45 @@ exports.payRent = async (req, res, next) => {
       ],
     });
 
-    const roomPrice = renting.Room.Type.price;
-    const amountOfPeople = await UserRenting.count({
-      where: {
-        renting_id: renting.id,
-      },
-    });
-    let allTrashPrice = 0;
 
-    if (validateResult.renting_pay) {
+    if(renting.active==0){
+      throw createHttpError(400,"this renting is already checkout");
+    }
+
+    const roomPrice = renting.Room.Type.price;
+    if (validateResult.renting_pay_by) {
       const isUserExisting = await User.findOne({
         where: {
-          id: validateResult.renting_pay_id,
+          id: validateResult.renting_pay_by,
         },
       });
       if (!isUserExisting) {
         throw createHttpError(404, "User not found");
       }
     }
+
+    let allTrashPrice = 0;
     if (validateResult.trash_pay_option) {
+
+      const amountOfPeople = await UserRenting.count({
+        where: {
+          renting_id: renting.id,
+        },
+      });
+
       allTrashPrice = getTrashPrice() * amountOfPeople;
     }
 
+
     await RentingDetail.update(
       {
-        is_trash_pay: validateResult.trash_pay_option,
-        is_renting_pay: true,
+        is_trash_pay: validateResult.trash_pay_option?paidType.PAID:paidType.UNPAID,
+        is_renting_pay: paidType.PAID,
         renting_pay_amount: roomPrice,
         trash_pay_amount: allTrashPrice,
-        renting_pay_by: validateResult.renting_pay,
+        renting_pay_by: validateResult.renting_pay_by,
         trash_pay_by: validateResult.trash_pay_option
-          ? validateResult.renting_pay
+          ? validateResult.renting_pay_by
           : null,
       },
       {
@@ -226,32 +300,117 @@ exports.payRent = async (req, res, next) => {
         transaction: t,
       }
     );
-    if (date.isSameDay(renting_detail.end_date, renting.end_renting_date)) {
-      for (let i = 1; i <= validateResult.months; i++) {
-        await RentingDetail.create(
-          {
-            renting_id: renting.id,
-            end_date: date.addMonths(now, i),
-            is_trash_pay: false,
-            is_renting_pay: false,
-          },
-          {
-            transaction: t,
-          }
-        );
-      }
-      await Renting.update(
+   
+    let months = validateResult.months;
+   
+    
+    let end_renting_date = date.addMonths(date.parse(renting_detail.end_date,"YYYY-MM-DD"), months);
+   
+  if(renting_detail.Renting.is_active){
+  if(months == 1&&date.isSameDay(date.parse(renting_detail.end_date,"YYYY-MM-DD"), date.parse(renting.end_renting_date,"YYYY-MM-DD"))){
+  
+      await RentingDetail.create(
         {
-          end_renting_date: end_renting_date,
+          renting_id: renting.id,
+          end_date: end_renting_date,
+          is_trash_pay: paidType.UNPAID,
+          is_renting_pay: paidType.UNPAID,
         },
         {
-          where: {
-            id: renting.id,
-          },
           transaction: t,
         }
       );
+    
+    await Renting.update(
+      {
+        end_renting_date: end_renting_date,
+      },
+      {
+        where: {
+          id: renting.id,
+        },
+        transaction: t,
+      }
+    );
+  }
+  else if (months>1 && date.isSameDay(date.parse(renting_detail.end_date,"YYYY-MM-DD"), date.parse(renting.end_renting_date,"YYYY-MM-DD"))){
+   
+    for (let i = 1; i <= months; i++) {
+        if(i==months){
+          await RentingDetail.create(
+            {
+              renting_id: renting.id,
+              end_date: date.addMonths(date.parse(renting_detail.end_date,"YYYY-MM-DD"), i),
+              is_trash_pay: paidType.UNPAID,
+              is_renting_pay: paidType.UNPAID,
+            },
+            {
+              transaction: t,
+            }
+          );
+        }
+        else{
+          await RentingDetail.create(
+            {
+              renting_id: renting.id,
+              end_date: date.addMonths(date.parse(renting_detail.end_date,"YYYY-MM-DD"), i),
+              is_trash_pay: paidType.UNPAID,
+              is_renting_pay: paidType.PAID,
+              renting_pay_amount: roomPrice,
+              renting_pay_by: validateResult.renting_pay_by,
+            },
+            {
+              transaction: t,
+            }
+          );
+        }
+     
     }
+    await Renting.update(
+      {
+        end_renting_date: end_renting_date,
+      },
+      {
+        where: {
+          id: renting.id,
+        },
+        transaction: t,
+      }
+    );
+  }
+}
+
+    // if (date.isSameDay(date.parse(renting_detail.end_date,"YYYY-MM-DD"), date.parse(renting.end_renting_date,"YYYY-MM-DD"))) {
+ 
+    //   if(months==1){
+    //     months++;
+    //   }
+    //   for (let i = 1; i <= months; i++) {
+        
+    //     await RentingDetail.create(
+    //       {
+    //         renting_id: renting.id,
+    //         end_date: date.addMonths(now, i),
+    //         is_trash_pay: false,
+    //         is_renting_pay: false,
+    //       },
+    //       {
+    //         transaction: t,
+    //       }
+    //     );
+    //   }
+    //   await Renting.update(
+    //     {
+    //       end_renting_date: end_renting_date,
+    //     },
+    //     {
+    //       where: {
+    //         id: renting.id,
+    //       },
+    //       transaction: t,
+    //     }
+    //   );
+    // }
 
     await t.commit();
     return res.status(200).json({
@@ -316,28 +475,58 @@ exports.checkOut = async (req, res, next) => {
         id: validationResult.renting_id,
       },
     });
-    if (!renting) createHttpError.NotFound("Renting not found");
-    if (validationResult.bypass_checkout) {
-      const checkNotPayRecord = await RentingDetail.findAll({
-        where: {
-          [Op.or]: [
-            {
-              is_trash_pay: false,
-            },
-            { is_renting_pay: false },
-          ],
-        },
-      });
-      if (
-        typeof checkNotPayRecord !== "undefined" &&
-        checkNotPayRecord.length > 0
-      ) {
-        throw createHttpError(
-          400,
-          "Due bypass check option you need to make a payment before checkout"
-        );
-      }
+    if (!renting) throw createHttpError.NotFound("Renting not found");
+    
+
+    const checkNotPayRecord = await RentingDetail.findOne({
+      where: {
+        end_date:renting.end_renting_date
+      },
+    });
+    
+    if(renting.is_active==false){
+      throw createHttpError.BadRequest("This renting is already checked out");
     }
+
+    if (validationResult.bypass_checkout) {
+     if(checkNotPayRecord.is_trash_pay!=paidType.PAID||checkNotPayRecord.is_renting_pay!=paidType.PAID) {
+         throw createHttpError(
+               400,
+               "Due bypass check option you need to make a payment before checkout"
+             );
+     }
+    }else{
+      if(checkNotPayRecord.is_trash_pay!=paidType.PAID) {
+        checkNotPayRecord.is_trash_pay=paidType.PASS;
+      }
+    
+    if(checkNotPayRecord.is_renting_pay!=paidType.PAID) {
+      checkNotPayRecord.is_renting_pay = paidType.PASS;
+      }
+      checkNotPayRecord.save();
+    }
+
+    // if (validationResult.bypass_checkout) {
+    //   const checkNotPayRecord = await RentingDetail.findAll({
+    //     where: {
+    //       [Op.or]: [
+    //         {
+    //           is_trash_pay: false,
+    //         },
+    //         { is_renting_pay: false },
+    //       ],
+    //     },
+    //   });
+    //   if (
+    //     typeof checkNotPayRecord !== "undefined" &&
+    //     checkNotPayRecord.length > 0
+    //   ) {
+    //     throw createHttpError(
+    //       400,
+    //       "Due bypass check option you need to make a payment before checkout"
+    //     );
+    //   }
+    // }
     await Renting.update(
       {
         is_active: false,
@@ -349,6 +538,15 @@ exports.checkOut = async (req, res, next) => {
         transaction: t,
       }
     );
+
+    await Room.update({
+      is_active:false
+    },{
+      where:{
+        id:renting.room_id
+      },
+      transaction: t,
+    });
     await t.commit();
     return res.status(200).json({
       data: renting,
@@ -532,19 +730,19 @@ exports.getAllRentingDetail = async (req,res,next)=>{
   try{
     let option = [];
     if(req.query.isTrashPay==="true"){
-      option.push({"is_trash_pay":true})
+      option.push({"is_trash_pay":paidType.PAID})
       //option.is_trash_pay =true;
     }
     if(req.query.isTrashPay==="false"){
      // option.is_trash_pay =false;
-     option.push({"is_trash_pay":false})
+     option.push({"is_trash_pay":paidType.UNPAID})
     }
     if(req.query.isRentingPay==="true"){
      // option.is_renting_pay =true;
-      option.push({"is_renting_pay":true})
+      option.push({"is_renting_pay":paidType.PAID})
     }
     if(req.query.isRentingPay==="false"){
-      option.push({"is_renting_pay":false})
+      option.push({"is_renting_pay":paidType.UNPAID})
     //  option.is_renting_pay =false;
     }
  
