@@ -71,8 +71,14 @@ exports.updateCurrentNotificationSetting = async (req,res,next)=>{
        }
 
        await Notification.update({
-
-       })
+           personal_option:validatedResult.personal_option,
+           global_option:validatedResult.global_option
+       },{
+           where:{
+               user_id:req.user.id
+           },
+           transaction:t
+       });
 
         await t.commit();
         return res.status(200).json({
