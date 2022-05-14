@@ -6,6 +6,7 @@ import {
   Type,
   UserRenting,
   User,
+  Setting
 } from "../../models";
 import { Op } from "sequelize";
 import price from "../../constants/price";
@@ -50,7 +51,14 @@ exports.payTrash = async (req, res, next) => {
         });
     }
 
-    let allTrashPrice = getTrashPrice() * amountOfPeople;
+    const trash_price = await Setting.findOne({
+      where:{
+        name:"trash_price"
+      }
+  });
+    //let allTrashPrice = getTrashPrice() * amountOfPeople;
+
+    let allTrashPrice = parseInt(trash_price) * amountOfPeople;
 
     await RentingDetail.update(
       {

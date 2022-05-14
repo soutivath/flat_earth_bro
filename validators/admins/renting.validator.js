@@ -16,6 +16,7 @@ export const payRentSchema = Joi.object({
     "trash_pay_option":Joi.boolean().required(),
     "months":Joi.number().integer().required(),
     "renting_pay_by":Joi.number().integer().required(),
+    "renting_fine":Joi.boolean().required()
     
 });
 

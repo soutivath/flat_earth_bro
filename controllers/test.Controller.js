@@ -1,42 +1,28 @@
-import {sequelize} from "../models";
+import { sequelize } from "../models";
 import createHttpError from "http-errors";
-import {setFloderName} from "../constants/floderName";
+import { setFloderName } from "../constants/floderName";
+
+import { differenceInDays } from 'date-fns'
+import { format } from 'date-fns'
 
 const fs = require("fs");
 const path = require("path");
-const { dirname } = require('path');
+const { dirname } = require("path");
 import { promises } from "fs";
 
-exports.testMulter = async (req, res,next)=>{
-    
-
-    
-  //  const files = req.files;
-    
-try{
-    setFloderName();
-    
+exports.testMulter = async (req, res, next) => {
+    var now = new Date();
+    var endDate = new Date("2022-05-13");
+    let result = differenceInDays(now,endDate);
     return res.status(200).json({
-        data:"nice",
-    })
-    const appDir = dirname(require.main.filename);
-    let dir = `${appDir}/public/images/resources/room/room1`;
-    const files = await promises.readdir(dir);
-    const mutation = [];
-    for(let file of files){
-        mutation.push(`${process.env.APP_DOMAIN}/images/resources/room/room1/${file.toString()}`)
-    }
-    
-    return res.status(200).json({
-        data:mutation
+        "data":result
     });
+//   var given = moment("2022-05-11", "YYYY-MM-DD");
+//   var current = moment().startOf("day");
 
-
-}catch(err){
-    try{
-      fs.unlinkSync(files[0].path)
-    }catch(err){
-    }
-    next(err);
-}
-}
+//   //Difference in number of days
+// let nice=  moment.duration(given.diff(current)).asDays();
+//   return res.status(200).json({
+//     data: current,
+//   });
+};

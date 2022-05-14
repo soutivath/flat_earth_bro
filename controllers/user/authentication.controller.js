@@ -1,5 +1,5 @@
 
-import { sequelize, User } from "../../models";
+import { sequelize, User ,Notification} from "../../models";
 import {
   registerUserSchema,
   loginUserSchema,
@@ -114,6 +114,14 @@ exports.register = async (req, res, next) => {
       })
       .catch((error) => {
         console.log("Error subscribing to topic:", error);
+      });
+
+      await Notification.create({
+        user_id:user.id,
+        global_option:true,
+        personal_option:true,
+      },{
+        transaction:t
       });
 
     const accessToken = JWT.genAccessJWT(payload);

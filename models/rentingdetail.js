@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     renting_pay_amount:DataTypes.INTEGER,
     trash_pay_by:DataTypes.INTEGER,
     renting_pay_by:DataTypes.INTEGER,
-
+    fine:DataTypes.INTEGER
 
   }, {
     sequelize,

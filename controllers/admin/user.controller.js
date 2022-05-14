@@ -1,4 +1,4 @@
-import { sequelize,User } from "../../models";
+import { sequelize,User,Notification } from "../../models";
 
 import {randomTopicString} from "../../libs/utils/randomString";
 import {postEditAdminSchema,addUserSchema} from "../../validators/admins/user.validator";
@@ -77,6 +77,16 @@ exports.addAdmin = async (req, res, next) => {
         },{
             transaction:t
         });
+
+        await Notification.create({
+            user_id:newAdmin.id,
+            global_option:false,
+            personal_option:false,
+        },
+        {
+            transaction:t
+        });
+
         await t.commit();
         return res.status(201).json({
             data:newAdmin,

@@ -4,7 +4,7 @@ import {profileUpload as uploader} from "../../middlewares/multer";
 const router = express.Router();
 
 router.post("/editProfile",uploader.array("profile_image",1),profile.editProfile);
-router.put("/resetPassword",profile.resetPassword);
+
 router.post("/logout",profile.logout);
 
 router.get("/profile",profile.getCurrentProfile);

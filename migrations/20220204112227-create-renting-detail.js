@@ -56,6 +56,9 @@ module.exports = {
           key:"id"
         }
       },
+      fine:{
+        type:Sequelize.INTEGER,
+      },
       
       createdAt: {
         allowNull: false,

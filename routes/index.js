@@ -19,7 +19,13 @@ import authRouteUser from "./user/authentication.Route";
 import profileRouteUser from "./user/profile.Route";
 import rentingRouteUser from "./user/renting.Route";
 import testRoute from "./test.Route";
+
+import resetPassword from "./user/reset_password_route";
+
+import notification from "./user/notification.Route";
 // //-------------------->
+
+import option from "./admin/setting.Route";
 
 //middlewares
 
@@ -36,9 +42,16 @@ app.use("/admin",[Auth,isAdmin],trashRouteAdmin);
 app.use("/admin",[Auth,isAdmin],typeRouteAdmin);
 app.use("/admin",[Auth,isAdmin],userRouteAdmin);
 
+app.use('/admin',[Auth,isAdmin],option);
+
 app.use("/user",[Auth],authRouteUser);
 app.use("/user",[Auth],profileRouteUser);
 app.use("/user",[Auth],rentingRouteUser);
 app.use("/test",[Auth],testRoute);
 
+app.use('/user',[Auth],notification);
+
+
+app.use("/user",resetPassword);
+app.use("/test",testRoute)
 module.exports = app;

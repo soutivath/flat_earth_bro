@@ -9,7 +9,10 @@ import {
   Type,
   User,
   Bill,
+  Setting
 } from "../../models";
+
+
 import date from "date-and-time";
 import { checkActiveRoom, checkExistingRenting } from "../helpers/rooms.helper";
 import { getTrashPrice } from "../../constants/price";
@@ -278,8 +281,32 @@ exports.payRent = async (req, res, next) => {
         },
       });
 
-      allTrashPrice = getTrashPrice() * amountOfPeople;
+      const trash_price = await Setting.findOne({
+          where:{
+           name:"trash_price"
+          }
+      });
+      //allTrashPrice = getTrashPrice() * amountOfPeople;
+      allTrashPrice = parseInt(trash_price) * amountOfPeople;
     }
+
+    //fine
+    let fine = 0;
+    if(validateResult.renting_fine){
+      
+      const finePrice = await Setting.findOne({
+        where:{
+         name:"fine"
+        }
+    });
+      let now = new Date();
+    let endDate = new Date(renting_detail.end_date);
+    let result = differenceInDays(now,endDate);
+    if(result>0){
+      fine = parseInt(finePrice) * result;
+    }
+    }
+    
 
 
     await RentingDetail.update(
@@ -288,6 +315,7 @@ exports.payRent = async (req, res, next) => {
         is_renting_pay: paidType.PAID,
         renting_pay_amount: roomPrice,
         trash_pay_amount: allTrashPrice,
+        fine:fine,
         renting_pay_by: validateResult.renting_pay_by,
         trash_pay_by: validateResult.trash_pay_option
           ? validateResult.renting_pay_by
