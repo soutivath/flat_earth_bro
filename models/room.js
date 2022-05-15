@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Room',
+    tableName:'rooms'
   });
   Room.prototype.getRoomPath = function(){
     return `${appDir}/public/images/resources/room/${this.images_path}`;

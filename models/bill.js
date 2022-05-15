@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Bill',
+    tableName:'bills'
   });
 
   Bill.prototype.getImagePath = function nice(){
