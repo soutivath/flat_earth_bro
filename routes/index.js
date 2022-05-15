@@ -33,6 +33,7 @@ import { Auth } from '../middlewares/auth.guard';
 import {isAdmin} from '../middlewares/isAdmin.guard'
  const app = express();
 
+ 
 app.use("/admin",authRouteAdmin);
 app.use("/admin",[Auth,isAdmin],billRouteAdmin);
 app.use("/admin",[Auth,isAdmin],notificationRouteAdmin);
@@ -53,5 +54,7 @@ app.use('/user',[Auth],notification);
 
 
 app.use("/user",resetPassword);
-app.use("/test",testRoute)
+app.use("/test",testRoute);
+
+
 module.exports = app;
