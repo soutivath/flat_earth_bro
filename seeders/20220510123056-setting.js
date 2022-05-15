@@ -11,13 +11,13 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-     await queryInterface.bulkInsert('Settings', [{
+     await queryInterface.bulkInsert('settings', [{
       name:"trash_price",
       value:5000,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});
-     await queryInterface.bulkInsert('Settings', [{
+     await queryInterface.bulkInsert('settings', [{
       name:"fine",
       value:1000,
       createdAt: new Date(),
