@@ -1,7 +1,7 @@
 import { sequelize,User,Notification } from "../../models";
 
 import {randomTopicString} from "../../libs/utils/randomString";
-import {postEditAdminSchema,addUserSchema} from "../../validators/admins/user.validator";
+import {postEditAdminSchema,addUserSchema,adminAddUserSchema} from "../../validators/admins/user.validator";
 import {compareHashPassword,hashPassword} from "../../libs/utils/bcrypt";
 import { response } from "express";
 import fs from "fs";
@@ -132,7 +132,7 @@ exports.addUser = async (req,res,next)=>{
     const t = await sequelize.transaction();
     try{
         const imageProfile = "default_profile.png";
-        const validatedResult = await addUserSchema.validateAsync(req.body);
+        const validatedResult = await adminAddUserSchema.validateAsync(req.body);
         const newUser = await User.create({
             name:validatedResult.name,
             phoneNumber:validatedResult.phoneNumber,

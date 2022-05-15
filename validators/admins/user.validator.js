@@ -11,3 +11,8 @@ export const addUserSchema = Joi.object({
     "password":Joi.string().required(),
     "phoneNumber":Joi.number().integer().required(),
 });
+export const adminAddUserSchema = Joi.object({
+    "name":Joi.string().required(),
+  
+    "phoneNumber":Joi.number().integer().required(),
+});

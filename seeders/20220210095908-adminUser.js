@@ -2,14 +2,14 @@
 
 import {faker} from '@faker-js/faker';
 import {hashPassword} from '../libs/utils/bcrypt.js';
-const users = [...Array(20)].map((user)=>({
+const users = [...Array(10)].map((user)=>({
          name: faker.name.firstName(),
          phoneNumber:faker.phone.phoneNumber(), 
          password:hashPassword("password"),
          image: faker.image.avatar(),
          notification_topic:"admin_noficiation_topic",
          firebase_uid:"thisisfirebaseuid",
-         is_admin:1,
+         is_admin:3,
          createdAt: new Date(),
          updatedAt: new Date()
 }));
