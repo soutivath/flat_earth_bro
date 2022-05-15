@@ -2,7 +2,7 @@
 const { dirname } = require('path');
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('RentingDetails', {
+    await queryInterface.createTable('rentingdetails', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,7 +13,7 @@ module.exports = {
         type:Sequelize.INTEGER,
         allowNull: false,
         references:{
-          model:"Rentings",
+          model:"rentings",
           key:"id",
           onDelete:"CASCADE"
         }
@@ -42,7 +42,7 @@ module.exports = {
         type:Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model:"Users",
+          model:"users",
           onDelete:"SET NULL",
           key:"id"
         }
@@ -51,7 +51,7 @@ module.exports = {
         type:Sequelize.INTEGER,
         allowNull: true,
         references:{
-          model:"Users",
+          model:"users",
           onDelete:"SET NULL",
           key:"id"
         }
@@ -71,6 +71,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('RentingDetails');
+    await queryInterface.dropTable('rentingdetails');
   }
 };
