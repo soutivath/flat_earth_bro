@@ -20,7 +20,7 @@ module.exports = {
       name: faker.name.firstName(),
       phoneNumber:faker.phone.phoneNumber(), 
       password:hashPassword("password"),
-      image: faker.image.avatar(),
+      image: "default_profile.png",
       notification_topic:"admin_noficiation_topic",
       firebase_uid:"thisisfirebaseuid",
       is_admin:1,
