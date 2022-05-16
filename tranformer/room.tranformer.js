@@ -17,6 +17,7 @@ exports.showTransformer = async (data)=>{
             name:room.name,
             createdAt:room.createdAt,
             allImages: allImages,
+            is_active:room.is_active,
             type:{
                 id:room["Type"].id,
                 name:room["Type"].name,
@@ -47,6 +48,7 @@ exports.aShowTransformer = async (room)=>{
             name:room.name,
             createdAt:room.createdAt,
             allImages: allImages,
+            is_active:room.is_active,
             type:{
                 id:room["Type"].id,
                 name:room["Type"].name,
