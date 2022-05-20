@@ -44,6 +44,10 @@ module.exports = {
           onDelete:"SET NULL"
         }
       },
+      proof_of_payment:{
+        allowNull: true,
+        type:Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

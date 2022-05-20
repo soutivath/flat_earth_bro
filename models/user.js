@@ -16,10 +16,13 @@ module.exports = (sequelize, DataTypes) => {
 
       this.hasMany(models.Notification, {foreignKey: 'user_id',as:"notification"});
 
-      this.hasMany(models.RentingDetail,{foreignKey:"trash_pay_by",as:"trash_pay",onDelete:"SET NULL"});
+     
       this.hasMany(models.RentingDetail,{foreignKey:"renting_pay_by",as:"renting_pay",onDelete:"SET NULL"});
 
      this.hasMany(models.Bill,{foreignKey:"pay_by",as:"pay_by",onDelete:"SET NULL"});
+
+     //this.hasMany(models.RentingDetail,{foreignKey:"trash_pay_by",as:"trash_pay",onDelete:"SET NULL"});
+     this.hasMany(models.Trash,{foreignKey:"trash_pay_by"});
     }
   }
   User.init({

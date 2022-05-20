@@ -12,20 +12,23 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
-      this.belongsTo(models.User,{foreignKey: 'trash_pay_by',as:"trash_pay"});
-      this.belongsTo(models.User,{foreignKey: 'renting_pay_by',as:"renting_pay"})
+     
+      this.belongsTo(models.User,{foreignKey: 'renting_pay_by',as:"renting_pay"});
+
+      this.hasMany(models.Trash,{foreignKey:'rentingdetails_id',as:'trash'});
     }
   }
   RentingDetail.init({
     renting_id:DataTypes.INTEGER,
     end_date:DataTypes.DATEONLY,
-    is_trash_pay:DataTypes.ENUM("paid","unpaid","pass"),
+   
     is_renting_pay:DataTypes.ENUM("paid","unpaid","pass"),
-    trash_pay_amount:DataTypes.INTEGER,
+  
     renting_pay_amount:DataTypes.INTEGER,
-    trash_pay_by:DataTypes.INTEGER,
+  
     renting_pay_by:DataTypes.INTEGER,
-    fine:DataTypes.INTEGER
+    fine:DataTypes.INTEGER,
+    proof_of_payment:DataTypes.STRING,
 
   }, {
     sequelize,

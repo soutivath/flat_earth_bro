@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     is_pay:DataTypes.BOOLEAN,
     renting_id:DataTypes.INTEGER,
     is_user_read:DataTypes.BOOLEAN,
-    pay_by:DataTypes.INTEGER
+    pay_by:DataTypes.INTEGER,
+    proof_of_payment:DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Bill',
