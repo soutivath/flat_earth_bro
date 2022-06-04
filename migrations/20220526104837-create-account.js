@@ -1,40 +1,46 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('rooms', {
+    await queryInterface.createTable('accounts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      phoneNumber: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      is_active:{
-        type:Sequelize.BOOLEAN,
-        allowNull: false
-      },
-      images_path:{
+      password: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true
       },
-      type_id:{
-        type:Sequelize.INTEGER,
-        allowNull: false,
+      global_option: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true
+      },
+      personal_option: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true
+      },
+      notification_topic:{
+        type:Sequelize.STRING,
+        allowNull: true
+      },
+      uid:{
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
         references:{
-          model:"types",
+          model:"users",
           key:"id",
           onDelete:"CASCADE"
         }
       },
-      electric_motor_number:{
-        type:Sequelize.STRING,
-      },
-      water_moter_number:{
-        type:Sequelize.STRING
-      },
+      display_name:Sequelize.STRING,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -46,6 +52,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('rooms');
+    await queryInterface.dropTable('accounts');
   }
 };

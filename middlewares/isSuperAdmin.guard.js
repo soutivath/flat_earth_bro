@@ -4,11 +4,13 @@ export const isAdmin = async(req,res,next)=>{
         return res.status(401).send({message:"unauth"});
     }
    
-    if(req.user.is_admin == "admin" || req.user.is_admin == "superadmin")
+    if(req.user.is_admin == "superadmin")
     {
         return next();
     }
 
     return res.status(403).send({message:"You don't have permission to access this content"});
     
+
+
 }

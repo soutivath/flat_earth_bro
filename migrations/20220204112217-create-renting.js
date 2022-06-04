@@ -33,6 +33,16 @@ module.exports = {
         allowNull: false,
         type:Sequelize.INTEGER
       },
+      contract_path:{
+        type:Sequelize.STRING,
+        allowNull: true
+      },
+      user_id:{
+        type:Sequelize.INTEGER,
+      },
+      staff_id:{
+        type:Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

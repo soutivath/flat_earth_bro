@@ -24,7 +24,10 @@ module.exports = (sequelize, DataTypes) => {
     start_renting_date: DataTypes.DATEONLY,
     end_renting_date: DataTypes.DATEONLY,
     is_active:DataTypes.BOOLEAN,
-    deposit:DataTypes.INTEGER
+    deposit:DataTypes.INTEGER,
+    contract_path:DataTypes.STRING,
+    contract_user_id:DataTypes.INTEGER,
+    contract_staff_id:DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Renting',

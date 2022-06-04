@@ -12,13 +12,15 @@ module.exports = {
      * }], {});
     */
 
-     await queryInterface.bulkInsert('types',[{
+
+      await queryInterface.bulkInsert('types',[{
+        name:"ຫ້ອງທຳມະດາ",
+        price:"1000000",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }]);
+   
     
-       name:"ຫ້ອງທຳມະດາ",
-       price:"1000000",
-       createdAt: new Date(),
-       updatedAt: new Date()
-     }]);
     
   },
 

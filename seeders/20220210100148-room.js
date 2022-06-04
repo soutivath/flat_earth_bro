@@ -18,6 +18,8 @@ module.exports = {
         is_active:0,
         type_id:1,
         images_path:"room"+i,
+        electric_motor_number:i.toString().padEnd(10,"0"),
+        water_motor_number:i.toString().padStart(10,"0"),
         createdAt: new Date(),
         updatedAt: new Date()
       }], {});

@@ -16,25 +16,14 @@ module.exports = {
         type:Sequelize.STRING,
         allowNull: false
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
       image:{
         type:Sequelize.STRING,
       },
       is_admin: {
-        type:Sequelize.BOOLEAN,
-        allowNull:false,
-        defaultValue: false
+        type:Sequelize.ENUM("superadmin","admin","user"),
       },
-      notification_topic:{
+      personal_card_no:{
         type:Sequelize.STRING,
-        allowNull:false,
-      },
-      firebase_uid:{
-        type:Sequelize.STRING,
-        allowNull:false,
       },
       createdAt: {
         allowNull: false,

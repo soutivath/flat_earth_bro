@@ -16,18 +16,28 @@ module.exports = {
      * }], {});
      * 
     */
-   const users = [...Array(3)].map((user)=>({
-      name: faker.name.firstName(),
-      phoneNumber:faker.phone.phoneNumber(), 
-      password:hashPassword("password"),
-      image: "default_profile.png",
-      notification_topic:"admin_noficiation_topic",
-      firebase_uid:"thisisfirebaseuid",
-      is_admin:1,
+     let admin = await queryInterface.bulkInsert('users',[{
+    
+      name:"just normal Admin",
+      phoneNumber:"+8562022222222",
+      image:"default_profile.png",
+      is_admin:"admin",
+      personal_card_no:"2222222222",
       createdAt: new Date(),
       updatedAt: new Date()
-}));
-     await queryInterface.bulkInsert('users', users, {});
+    }]);
+    await queryInterface.bulkInsert('accounts',[{
+    phoneNumber:"+8562022222222",
+    password:hashPassword("password"),
+    personal_option:false,
+    global_option:false,
+    notification_topic:"admin_notification",
+    uid:"aPYUPs9n7vMKpHSRaNjfYNltBR13",
+    display_name:"normal admin display name",
+    user_id:admin,
+    createdAt: new Date(),
+    updatedAt: new Date()
+    }]);
 
     
   },

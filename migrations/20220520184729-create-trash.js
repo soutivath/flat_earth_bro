@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Trashes', {
+    await queryInterface.createTable('trashes', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,17 +9,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       is_trash_pay:{
-        type:Sequelize.ENUM('paid','unpaid','pass'),
+        type:Sequelize.ENUM('paid','unpaid','custom_paid'),
         allowNull: false,
-      },
-      trash_pay_by:{
-        type:Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model:"users",
-          onDelete:"SET NULL",
-          key:"id"
-        }
       },
       trash_pay_amount:{
         type:Sequelize.INTEGER,

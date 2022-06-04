@@ -12,13 +12,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.User,{foreignKey: 'trash_pay_by',as:"trash_pay"});
-      this.belongsTo(models.RentingDetails,{foreignKey: 'rentingdetails_id',as:"rentingdetails"});
+      this.belongsTo(models.RentingDetail,{foreignKey: 'rentingdetails_id',as:"rentingdetails"});
 
+     // this.hasMany(models.Account,{foreignKey:'user_id'});
     }
   }
   Trash.init({
     is_trash_pay:DataTypes.ENUM("paid","unpaid","pass"),
-    trash_pay_by:DataTypes.INTEGER,
     trash_pay_amount:DataTypes.INTEGER,
     rentingdetails_id: DataTypes.INTEGER,
     proof_of_payment:DataTypes.STRING,

@@ -23,28 +23,18 @@ module.exports = {
         allowNull: false,
       },
       is_renting_pay:{
-        type:Sequelize.ENUM('paid','unpaid','pass'),
+        type:Sequelize.ENUM('paid','unpaid','custom_paid'),
         allowNull: false,
       },
       renting_pay_amount:{
         type:Sequelize.INTEGER,
         allowNull: true,
       },
-      renting_pay_by:{
+      proof_of_payment:{
         type:Sequelize.INTEGER,
-        allowNull: true,
-        references:{
-          model:"users",
-          onDelete:"SET NULL",
-          key:"id"
-        }
       },
       fine:{
         type:Sequelize.INTEGER,
-      },
-      proof_of_payment:{
-        allowNull: true,
-        type:Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

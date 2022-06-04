@@ -18,6 +18,8 @@ exports.showTransformer = async (data)=>{
             createdAt:room.createdAt,
             allImages: allImages,
             is_active:room.is_active,
+            electric_motor_number:room.electric_motor_number,
+            water_motor_number:room.water_motor_number,
             type:{
                 id:room["Type"].id,
                 name:room["Type"].name,
@@ -49,6 +51,8 @@ exports.aShowTransformer = async (room)=>{
             createdAt:room.createdAt,
             allImages: allImages,
             is_active:room.is_active,
+            electric_motor_number:room.electric_motor_number,
+            water_motor_number:room.water_motor_number,
             type:{
                 id:room["Type"].id,
                 name:room["Type"].name,

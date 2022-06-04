@@ -3,10 +3,10 @@ import { sequelize,User,Notification } from "../../models";
 import {randomTopicString} from "../../libs/utils/randomString";
 import {postEditAdminSchema,addUserSchema,adminAddUserSchema} from "../../validators/admins/user.validator";
 import {compareHashPassword,hashPassword} from "../../libs/utils/bcrypt";
-import { response } from "express";
 import fs from "fs";
 import createHttpError from "http-errors";
 import {userTranformer} from "../../tranformer/user.tranformer";
+import { Op } from "sequelize";
 exports.editAdmin = async (req, res, next) => {
     const t = await sequelize.transaction();
     try {
@@ -23,7 +23,7 @@ exports.editAdmin = async (req, res, next) => {
        let profilePath = user.getProfilePath();
 
        let option = {};
-       option.name = validationResult.name;
+       option.name = validatedResult.name;
        if(req.files[0]){
        
             option.image = req.files[0].filename; 
@@ -86,6 +86,8 @@ exports.addAdmin = async (req, res, next) => {
         {
             transaction:t
         });
+
+        
 
         await t.commit();
         return res.status(201).json({
@@ -166,9 +168,9 @@ exports.getUser = async (req,res,next)=>{
     try{
         let option ={};
         if(req.query.isAdmin==="true"){
-            option.is_admin = true;
+            option.is_admin = {[Op.ne]:"user"}
         }else if(req.query.isAdmin==="false"){
-            option.is_admin = false;
+            option.is_admin = "user";
         }
         const userData = await User.findAll({
             where:option

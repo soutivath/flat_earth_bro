@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     type_id:DataTypes.INTEGER,
     images_path:DataTypes.STRING,
     is_active:DataTypes.BOOLEAN,
+    electric_motor_number:DataTypes.STRING,
+    water_motor_number:DataTypes.STRING,
+    
   }, {
     sequelize,
     modelName: 'Room',

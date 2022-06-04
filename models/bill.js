@@ -17,14 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Bill.init({
-  
     image_path:DataTypes.STRING,
     price:DataTypes.INTEGER,
     bill_type:DataTypes.ENUM("electric","water"),
     is_pay:DataTypes.BOOLEAN,
     renting_id:DataTypes.INTEGER,
-    is_user_read:DataTypes.BOOLEAN,
-    pay_by:DataTypes.INTEGER,
     proof_of_payment:DataTypes.STRING,
   }, {
     sequelize,

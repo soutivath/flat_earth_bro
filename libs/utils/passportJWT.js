@@ -2,7 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 import passport from 'passport'
-import { User } from '../../models'
+import { User,Account } from '../../models'
 import passportJWT from 'passport-jwt'
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;

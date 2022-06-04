@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
       },
       is_pay:{
-        type:Sequelize.BOOLEAN,
+        type:Sequelize.ENUM('paid','unpaid','custom_paid'),
       },
       renting_id:{
         type:Sequelize.INTEGER,
@@ -29,19 +29,6 @@ module.exports = {
           model:"rentings",
           key:"id",
           onDelete:"CASCADE"
-        }
-      },
-      is_user_read:{
-        type:Sequelize.BOOLEAN,
-        allowNull: false,
-      },
-      pay_by:{
-        type:Sequelize.INTEGER,
-        allownull: true,
-        references:{
-          model:"users",
-          key:"id",
-          onDelete:"SET NULL"
         }
       },
       proof_of_payment:{

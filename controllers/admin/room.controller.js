@@ -68,6 +68,8 @@ exports.post = async (req, res, next) => {
     const room = await Room.create({
       name: validateResult.name,
       images_path: req.files[0].folderName,
+      electric_motor_number:validateResult.electric_motor_number,
+      water_motor_number:validateResult.water_motor_number,
       type_id: validateResult.type_id,
     });
     return res.status(200).json({
@@ -129,8 +131,13 @@ let option = {};
       option.name = validateResult.name;
     }
 
-   
-  
+    if(validateResult.electric_motor_number){
+      option.electric_motor_number = validateResult.electric_motor_number;
+    }
+
+    if(validateResult.water_motor_number){
+      option.water_motor_number = validateResult.water_motor_number;
+    }
 
     const roomUpdated = await Room.update(
      option,

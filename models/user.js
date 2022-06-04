@@ -23,17 +23,17 @@ module.exports = (sequelize, DataTypes) => {
 
      //this.hasMany(models.RentingDetail,{foreignKey:"trash_pay_by",as:"trash_pay",onDelete:"SET NULL"});
      this.hasMany(models.Trash,{foreignKey:"trash_pay_by"});
+
+     this.hasMany(models.Account,{foreignKey:"user_id"});
     }
   }
   User.init({
     name: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
-    password: DataTypes.STRING,
+  
     image:DataTypes.STRING,
-    is_admin: DataTypes.BOOLEAN,
-    notification_topic:DataTypes.STRING,
-    firebase_uid:DataTypes.STRING,
-    display_name:DataTypes.STRING
+    is_admin: DataTypes.ENUM("superadmin","admin","user"),
+    personal_card_no:DataTypes.STRING,
   
   }, {
     sequelize,
