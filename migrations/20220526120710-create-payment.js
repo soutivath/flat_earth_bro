@@ -20,7 +20,7 @@ module.exports = {
           onDelete:"CASCADE"
         }
       },
-      poof_of_payment: {
+      proof_of_payment: {
         type: Sequelize.STRING,
         allowNull: true
       },

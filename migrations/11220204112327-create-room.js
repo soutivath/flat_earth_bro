@@ -32,7 +32,7 @@ module.exports = {
       electric_motor_number:{
         type:Sequelize.STRING,
       },
-      water_moter_number:{
+      water_motor_number:{
         type:Sequelize.STRING
       },
       createdAt: {

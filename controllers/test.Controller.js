@@ -11,12 +11,9 @@ const { dirname } = require("path");
 import { promises } from "fs";
 
 exports.testMulter = async (req, res, next) => {
-    var now = new Date();
-    var endDate = new Date("2022-05-13");
-    let result = differenceInDays(now,endDate);
-    return res.status(200).json({
-        "data":result
-    });
+  return res.status(200).json({
+      data:req.user
+  });
 //   var given = moment("2022-05-11", "YYYY-MM-DD");
 //   var current = moment().startOf("day");
 

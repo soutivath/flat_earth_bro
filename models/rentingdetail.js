@@ -13,11 +13,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
      
-      this.belongsTo(models.User,{foreignKey: 'renting_pay_by',as:"renting_pay"});
+    //  this.belongsTo(models.User,{foreignKey: 'renting_pay_by',as:"renting_pay"});
 
-      this.hasMany(models.Trash,{foreignKey:'rentingdetails_id',as:'trash'});
+      this.hasMany(models.Trash,{foreignKey:'rentingdetails_id'});
     }
   }
+
+  
   RentingDetail.init({
     renting_id:DataTypes.INTEGER,
     end_date:DataTypes.DATEONLY,

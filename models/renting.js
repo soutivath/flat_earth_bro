@@ -26,8 +26,8 @@ module.exports = (sequelize, DataTypes) => {
     is_active:DataTypes.BOOLEAN,
     deposit:DataTypes.INTEGER,
     contract_path:DataTypes.STRING,
-    contract_user_id:DataTypes.INTEGER,
-    contract_staff_id:DataTypes.INTEGER,
+    user_id:DataTypes.INTEGER,
+    staff_id:DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Renting',

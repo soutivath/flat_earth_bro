@@ -18,7 +18,7 @@ opts.algorithm = ["RS256"];
 passport.use(new JwtStrategy(opts, 
   async  function(jwt_payload, done) {
    
-    const user = await User.findOne({where:{id: jwt_payload.id}});
+    const user = await User.findOne({where:{id: jwt_payload.user_id},include: Account});
         if (user) {
             return done(null, user);
         }

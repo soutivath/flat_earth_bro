@@ -18,6 +18,13 @@ module.exports = {
         type: Sequelize.ENUM("water","electric","trash","renting","fine")
       
       },
+      payment_id:{
+        type: Sequelize.INTEGER,
+        references:{
+          model:"payments",
+          key:"id",
+          onDelete:"CASCADE"}
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
