@@ -4,13 +4,16 @@ import {
   addBillSchema,
   billOperateSchema,
   updateBillSchema,
+  Payment,
+  PaymentDetail
 } from "../../validators/admins/bill.validator";
 import fs from "fs";
 import billType from "../../constants/billType";
 
 import billImageTranformer from "../../tranformer/images/bill.tranformer";
 import {bills} from "../../tranformer/bill.tranformer";
-
+import date from "date-and-time";
+import paidType from "../../constants/paidType";
 
 const path = require("path");
 const { dirname } = require("path");
@@ -36,6 +39,9 @@ exports.addBill = async (req, res, next) => {
       renting_id: validatedResult.renting_id,
       is_user_read: false,
     });
+
+
+    
     await t.commit();
 
     return res.status(200).json({
@@ -55,50 +61,86 @@ exports.addBill = async (req, res, next) => {
 };
 
 exports.payBill = async (req, res, next) => {
+  const t = await sequelize.transaction();
+
   try {
+    let totalPrice = 0;
     const validatedResult = await billOperateSchema.validateAsync(req.body);
 
-    let checkBill = await Bill.findOne({
-      where:{
-        id:req.params.id
-      },plain:true
-    });
-
-    if (!checkBill) {
-      throw createHttpError(404, "Bill not found");
-    }
-    if (checkBill.is_pay) {
-      throw createHttpError(400, "Bill is already paid");
-    }
     let checkUser = await User.findOne({
       where: {
         id: validatedResult.pay_by,
       },
-    
     });
-
     if (!checkUser) {
       throw createHttpError(404, "User not found");
     }
-    await Bill.update(
-      {
-        is_pay: true,
-        pay_by: validatedResult.pay_by,
-      },
-      {
-        where: {
-          id: req.params.id,
-        },
+
+    const now  = date.format(new Date,"YYYY-MM-DD");
+    let payment = await PaymentDetail.create({
+      pay_by:validatedResult.pay_by,
+      renting_id:renting_id,
+      operate_by:req.user.id,
+      pay_date:now
+    },{
+      transaction:t
+    });
+
+    for(let aBill of validatedResult.bill_id){
+      let checkBill = await Bill.findOne({
+        where:{
+          id:aBill
+        },plain:true
+      });
+      if (!checkBill) {
+        throw createHttpError(404, "Bill not found");
       }
-    );
-    checkBill.is_pay = true;
-    checkBill.pay_by = validatedResult.pay_by;
+      if (checkBill.is_pay) {
+        throw createHttpError(400, "Some bills is already paid");
+      }
+
+      if(checkBill.renting_id != validatedResult.renting_id){
+        throw createHttpError(400,"Renting ID not match");
+      }
+      await Bill.update(
+        {
+          is_pay: paidType.PAID,
+          proof_of_payment:payment.id
+        },
+        {
+          where: {
+            id: aBill,
+          },
+          transaction: t,
+        }
+      );
+      totalPrice += parseInt(checkBill.price);
+      let name = checkBill.bill_type=="water"?payment_detail_enum.WATER:payment_detail_enum.ELECTRIC;
+      await PaymentDetail.create({
+        name:name.LA +" ວັນທີ "+date.parse(checkBill.createAt,"YYYY-MM-DD"),
+        price:checkBill.price,
+        type:name.EN,
+        payment_id:payment.id,
+      },{
+        transaction: t,
+      });
+    }
+
+    await Payment.update({
+      total:totalPrice,
+      payment_no:payment_no
+    },{
+      transaction:t
+    });
+
+    await t.commit();
     return res.status(200).json({
       data: checkBill,
       message: "Bill has been paid successfully",
       success: true,
     });
   } catch (err) {
+    await t.rollback();
     next(err);
   }
 };

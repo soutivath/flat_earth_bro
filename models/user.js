@@ -24,7 +24,10 @@ module.exports = (sequelize, DataTypes) => {
      //this.hasMany(models.RentingDetail,{foreignKey:"trash_pay_by",as:"trash_pay",onDelete:"SET NULL"});
    //  this.hasMany(models.Trash,{foreignKey:"trash_pay_by"});
 
-     this.hasMany(models.Account,{foreignKey:"user_id"});
+     this.hasOne(models.Account,{foreignKey:"user_id"});
+
+     this.hasMany(models.Payment, {foreignKey: 'pay_by',as:"pay_by"});
+     this.hasMany(models.Payment, {foreignKey: 'operate_by',as:"operate_by"});
     }
   }
   User.init({

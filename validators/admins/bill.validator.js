@@ -14,6 +14,8 @@ export const updateBillSchema = Joi.object({
 
 export const billOperateSchema = Joi.object({
     "pay_by":Joi.number().integer().required(),
+    "bill_id":Joi.array().items(Joi.number().integer()).required(),
+    "renting_id":Joi.number().integer().required()
 });
 
 

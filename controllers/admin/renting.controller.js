@@ -938,6 +938,7 @@ exports.checkOut = async (req, res, next) => {
   try {
     const nowDate = date.format(new Date(), "YYYY-MM-DD");
     const validationResult = await checkOutSchema.validateAsync(req.body);
+    let isLastRentingGotDelete = false;
     const renting = await Renting.findOne({
       where: {
         id: validationResult.renting_id,
@@ -957,147 +958,226 @@ exports.checkOut = async (req, res, next) => {
     if (renting.is_active == false) {
       throw createHttpError.BadRequest("This renting is already checked out");
     }
+    const trash = await Setting.findOne({
+      where: {
+        name: "trash_price",
+      },
+    });
+    const allTrashPrice = trash.value;
 
-    if (date.subtract(nowDate, checkNotPayRecord[1].end_date) > 0) {
-      // ໂຕລ້າສຸດ ຕ້ອງຈ່າຍ
-      let payment = await Payment.create(
-        {
-          pay_by:checkOutSchema.renting_pay_by,
-          renting_id:renting.id,
-          operate_by:req.user.user_id,
-
-        },
-        {
-          transaction: t,
-        }
-      );
-      let payment_no = payment.id.toString().padStart(10, "0");
-      await RentingDetail.update(
-        {
-          is_renting_pay: paidType.PAID,
-          end_date: nowDate,
-          renting_pay_amount: checkOutSchema.amount,
-          proof_of_payment:payment_no
-        },
-        {
-          transaction: t,
-        }
-      );
-
-      await PaymentDetail.create(
-        {
-          name:"",
-          price:"",
-          type:"",
-          payment_id:payment.id,
-        },
-        {
-          transaction: t,
-        }
-      );
-     
-
-    
-    } else {
-      //ລົບໂຕລ້າສຸດ
+    if (!date.subtract(nowDate, checkNotPayRecord[1].end_date) > 0) {
       let aToDeleteTrash = await Trash.findOne({
         where: {
           id: checkNotPayRecord[0].Trashes.id,
         },
       });
-      if (aToDeleteTrash.is_renting_pay != paidType.PAID) {
-        await aToDeleteTrash.delete();
-      }
-
       let aToDeleteRentingDetail = await RentingDetail.findOne({
         where: {
           id: checkNotPayRecord[0].id,
         },
       });
-
-      if (aToDeleteRentingDetail.is_trash_pay != paidType.PAID) {
-        await aToDeleteRentingDetail.delete();
-      }
-
-      let allNotPaidRenting = await RentingDetail.findAll({
-        where: {
-          [Op.and]: {
-            id: {
-              [Op.ne]: twoLastedRecord[0].id,
-            },
-          },
-          [Op.and]: {
-            is_renting_pay: paidType.UNPAID,
-          },
-        },
-      });
       if (
-        typeof allNotPaidRenting !== "undefined" &&
-        allNotPaidRenting.length > 0
+        aToDeleteTrash.is_renting_pay != paidType.PAID &&
+        aToDeleteRentingDetail.is_trash_pay != paidType.PAID
       ) {
-        // the array is defined and has at least one element
-      }
+        await aToDeleteTrash.destroy({
+          transaction: t,
+        });
+        await aToDeleteRentingDetail.destroy({
+          transaction: t,
+        });
 
-      let allNotPaidTrash = await Trash.findAll({
-        where: {
-          [Op.and]: {
-            id: {
-              [Op.ne]: twoLastedRecord[0].id,
+        await Renting.update(
+          {
+            end_renting_date: checkNotpayRecord[1].end_date,
+          },
+          {
+            where: {
+              id: renting.id,
             },
-          },
-          [Op.and]: {
-            is_trash_pay: paidType.UNPAID,
-          },
-        },
-      });
-    }
-
-    if (typeof allNotPaidTrash !== "undefined" && allNotPaidTrash.length > 0) {
-      // the array is defined and has at least one element
-    }
-
-    if (validationResult.bypass_checkout) {
-      if (
-        checkNotPayRecord.Trashes.is_trash_pay != paidType.PAID ||
-        checkNotPayRecord.is_renting_pay != paidType.PAID
-      ) {
-        throw createHttpError(
-          400,
-          "Due bypass check option you need to make a payment before checkout"
+            transaction: t,
+          }
         );
+        isLastRentingGotDelete = true;
       }
-    } else {
-      if (checkNotPayRecord.is_trash_pay != paidType.PAID) {
-        checkNotPayRecord.is_trash_pay = paidType.PASS;
-      }
-
-      if (checkNotPayRecord.is_renting_pay != paidType.PAID) {
-        checkNotPayRecord.is_renting_pay = paidType.PASS;
-      }
-      await checkNotPayRecord.save();
     }
 
-    // if (validationResult.bypass_checkout) {
-    //   const checkNotPayRecord = await RentingDetail.findAll({
-    //     where: {
-    //       [Op.or]: [
-    //         {
-    //           is_trash_pay: false,
-    //         },
-    //         { is_renting_pay: false },
-    //       ],
-    //     },
-    //   });
-    //   if (
-    //     typeof checkNotPayRecord !== "undefined" &&
-    //     checkNotPayRecord.length > 0
-    //   ) {
-    //     throw createHttpError(
-    //       400,
-    //       "Due bypass check option you need to make a payment before checkout"
-    //     );
-    //   }
-    // }
+    if (validationResult.validatebypass_checkout == true) {
+      let rentingDetailData = await RentingDetail.findAll(
+        {
+          where: {
+            renting_id: renting.id,
+          },
+          include: Trash,
+        },
+        {
+          transaction: t,
+        }
+      );
+
+      if (
+        typeof rentingDetailData !== "undefined" &&
+        rentingDetailData.length > 0
+      ) {
+        for (let eachRenting of rentingDetailData) {
+          if (eachRenting.is_renting_pay == paidType.UNPAID) {
+            await RentingDetail.update(
+              {
+                is_renting_pay: paidType.PASS,
+              },
+              {
+                where: {
+                  id: rentingDetailData.id,
+                },
+                transaction: t,
+              }
+            );
+          }
+
+          if (eachRenting.Trashes.is_trash_pay == paidType.UNPAID) {
+            await Trash.update(
+              {
+                is_trash_pay: paidType.PASS,
+              },
+              {
+                where: {
+                  rentingdetails_id: rentingDetailData.id,
+                },
+                transaction: t,
+              }
+            );
+          }
+        }
+      } else {
+        //ຈ່າຍໂຕລ້າສຸດ ພ້ອມ ອອກບິນ
+
+        let unpaidAllRentingDetails = await RentingDetail.findAll(
+          {
+            where: {
+              renting_id: renting.id,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+        let checkId = null;
+        if (isLastRentingGotDelete) {
+          checkId = twoLastedRecord[1].id;
+        } else {
+          checkId = twoLastedRecord[0].id;
+        }
+
+        for (let eachUnpaid of unpaidAllRentingDetails) {
+          if (eachUnpaid.id != checkId) {
+            if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
+              throw createHttpError(400, "Some renting not paid");
+            }
+            if (eachUnpaid.Trashes.is_trash_pay == paidType.UNPAID) {
+              throw createHttpError(400, "Some Trash not paid");
+            }
+          } else {
+            if (!pay_last_renting) {
+              throw createHttpError(400, "Please provide a payment detail");
+            }
+            let paidBy = await User.findOne(
+              {
+                where: {
+                  id: renting_pay_by,
+                },
+              },
+              {
+                transaction: t,
+              }
+            );
+            if (!paidBy) {
+              throw createHttpError(404, "User not found");
+            }
+            let checkout_payment = null;
+            let checkout_no = "";
+
+            if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
+              if (checkout_payment == null) {
+                checkout_payment = await Payment.create(
+                  {
+                    pay_by: checkOutSchema.renting_pay_by,
+                    renting_id: renting.id,
+                    operate_by: req.user.id,
+                  },
+                  {
+                    transaction: t,
+                  }
+                );
+                checkout_no =  checkout_payment.id.toString().padStart(10, "0");
+                await RentingDetail.update(
+                  {
+                    is_renting_pay: v,
+                    end_date: nowDate,
+                    renting_pay_amount: checkOutSchema.amount,
+                    proof_of_payment: checkout_payment_no,
+                  },
+                  {
+                    where: {
+                      id: twoLastedRecord[0].id,
+                    },
+                    transaction: t,
+                  }
+                );
+
+                await PaymentDetail.create({
+                  name: date.format(eachUnpaid.end_date, "M") - 1 == "0"
+                  ? payment_detail_enum.CHECKOUT.LA + "ເດືອນ " + "12"
+                  : payment_detail_enum.CHECKOUT.LA +
+                    "ເດືອນ " +
+                    (date.format(eachUnpaid.end_date, "M") - 1).toString(),
+                  price: validationResult.amount,
+                  type: payment_detail_enum.CHECKOUT.EN,
+                  payment_id: checkout_payment.id,
+                },{
+                  transaction: t,
+                });
+
+
+              }
+            }
+
+            if (eachUnpaid.Trashes.is_trash_pay == paidType.UNPAID) {
+              if (checkout_payment == null) {
+                checkout_payment = await Payment.create(
+                  {
+                    pay_by: checkOutSchema.renting_pay_by,
+                    renting_id: renting.id,
+                    operate_by: req.user.id,
+                  },
+                  {
+                    transaction: t,
+                  }
+                );
+                checkout_no =  checkout_payment.id.toString().padStart(10, "0");
+              }
+
+              await PaymentDetail.create({
+                name: date.format(eachUnpaid.end_date, "M") - 1 == "0"
+                ? payment_detail_enum.TRASH.LA + "ເດືອນ " + "12"
+                : payment_detail_enum.TRASH.LA +
+                  "ເດືອນ " +
+                  (date.format(eachUnpaid.end_date, "M") - 1).toString(),
+                price: allTrashPrice,
+                type: payment_detail_enum.TRASH.EN,
+                payment_id: checkout_payment.id,
+              },{
+                transaction: t,
+              });
+
+            }
+
+          }
+        }
+
+      
+      }
+    }
+
     await Renting.update(
       {
         is_active: false,

@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
 
-     this.belongsTo(models.User,{foreignKey: 'is_pay'});
+     //this.belongsTo(models.User,{foreignKey: 'is_pay'});
     }
   }
   Bill.init({

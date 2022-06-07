@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class PaymentDetail extends Model {
+  class GlobalNotification extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,18 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Payment, {foreignKey: 'payment_id'});
     }
   }
-  PaymentDetail.init({
-    name: DataTypes.STRING,
-    price: DataTypes.INTEGER,
-    type: DataTypes.ENUM("water","electric","trash","renting","fine"),
-    payment_id:DataTypes.INTEGER
+  GlobalNotification.init({
+    message: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'PaymentDetail',
-    tableName:'paymentdetails'
+    modelName: 'GlobalNotification',
   });
-  return PaymentDetail;
+  return GlobalNotification;
 };

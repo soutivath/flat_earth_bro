@@ -3,5 +3,6 @@ export default{
     ELECTRIC:{LA:"ຄ່າໄຟຟ້າ",EN:"electric"},
     TRASH:{LA:"ຄ່າຂີ້ເຫຍື້ອ",EN:"trash"},
     RENTING:{LA:"ຄ່າເຊົ່າ",EN:"renting"},
-    FINE:{LA:"ຄ່າປັບໄຫມ",EN:"fine"}
+    FINE:{LA:"ຄ່າປັບໄຫມ",EN:"fine"},
+    CHECKOUT:{LA:"ແຈ້ງອອກ",EN:"checkout"}
 }
