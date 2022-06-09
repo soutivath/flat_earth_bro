@@ -35,6 +35,24 @@ module.exports = {
         allowNull: true,
         type:Sequelize.STRING,
       },
+      pay_by:{
+        type:Sequelize.INTEGER,
+        allowNull: true,
+        references:{
+          model:"users",
+          key:"id",
+          onDelete:"CASCADE"
+        }
+      },
+      operate_by:{
+        allowNull: true,
+        type:Sequelize.INTEGER,
+        references:{
+          model:"users",
+          key:"id",
+          onDelete:"CASCADE"
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

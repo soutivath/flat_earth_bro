@@ -1,5 +1,5 @@
 
-import { sequelize, User ,Notification} from "../../models";
+import { sequelize, User ,Notification,Account,} from "../../models";
 import GLOBAL_TOPIC from "../../constants/notificationTopic";
 import notificationUpdateSchema from "../../validators/users/notificationUpdate.validator";
 import notification from "../../models/notification";

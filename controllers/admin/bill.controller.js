@@ -1,14 +1,15 @@
 import createHttpError from "http-errors";
-import { sequelize, Renting, Bill, User, Room } from "../../models";
+import { sequelize, Renting, Bill, User, Room,Payment,
+  PaymentDetail } from "../../models";
 import {
   addBillSchema,
   billOperateSchema,
   updateBillSchema,
-  Payment,
-  PaymentDetail
+  
 } from "../../validators/admins/bill.validator";
 import fs from "fs";
 import billType from "../../constants/billType";
+import payment_detail_enum from "../../constants/payment_detail";
 
 import billImageTranformer from "../../tranformer/images/bill.tranformer";
 import {bills} from "../../tranformer/bill.tranformer";
@@ -35,7 +36,7 @@ exports.addBill = async (req, res, next) => {
       image_path: image.filename,
       price: validatedResult.price,
       bill_type: validatedResult.bill_type,
-      is_pay: false,
+      is_pay: paidType.UNPAID,
       renting_id: validatedResult.renting_id,
       is_user_read: false,
     });
@@ -77,15 +78,18 @@ exports.payBill = async (req, res, next) => {
     }
 
     const now  = date.format(new Date,"YYYY-MM-DD");
-    let payment = await PaymentDetail.create({
+  
+    let payment = await Payment.create({
       pay_by:validatedResult.pay_by,
-      renting_id:renting_id,
+      renting_id:validatedResult.renting_id,
       operate_by:req.user.id,
       pay_date:now
     },{
       transaction:t
     });
 
+    let payment_no = payment.id.toString().padStart(10, "0");
+   
     for(let aBill of validatedResult.bill_id){
       let checkBill = await Bill.findOne({
         where:{
@@ -95,7 +99,7 @@ exports.payBill = async (req, res, next) => {
       if (!checkBill) {
         throw createHttpError(404, "Bill not found");
       }
-      if (checkBill.is_pay) {
+      if (checkBill.is_pay==paidType.PAID) {
         throw createHttpError(400, "Some bills is already paid");
       }
 
@@ -105,7 +109,9 @@ exports.payBill = async (req, res, next) => {
       await Bill.update(
         {
           is_pay: paidType.PAID,
-          proof_of_payment:payment.id
+          proof_of_payment:payment.id,
+          pay_by:validatedResult.pay_by,
+          operate_by: req.user.id
         },
         {
           where: {
@@ -114,10 +120,16 @@ exports.payBill = async (req, res, next) => {
           transaction: t,
         }
       );
+      
       totalPrice += parseInt(checkBill.price);
       let name = checkBill.bill_type=="water"?payment_detail_enum.WATER:payment_detail_enum.ELECTRIC;
+    
+
+ 
+
+
       await PaymentDetail.create({
-        name:name.LA +" ວັນທີ "+date.parse(checkBill.createAt,"YYYY-MM-DD"),
+        name:name.LA +" ວັນທີ "+date.format(checkBill.createdAt,"DD-MM-YYYY"),
         price:checkBill.price,
         type:name.EN,
         payment_id:payment.id,
@@ -125,17 +137,21 @@ exports.payBill = async (req, res, next) => {
         transaction: t,
       });
     }
+   
 
     await Payment.update({
       total:totalPrice,
       payment_no:payment_no
     },{
+      where:{
+        id:payment.id
+      },
       transaction:t
     });
 
     await t.commit();
     return res.status(200).json({
-      data: checkBill,
+      data: [],
       message: "Bill has been paid successfully",
       success: true,
     });
@@ -250,8 +266,10 @@ exports.getAll = async (req, res, next) => {
     }
     const allRentingData = await Bill.findAll({
       where: option,
-      include: [User, Renting],
+      include: ["bill_pay_by","bill_operate_by", Renting],
     });
+
+   
     return res
       .status(200)
       .json({
@@ -303,18 +321,24 @@ exports.getByRenting = async (req, res, next) => {
  */
 exports.getOne = async (req, res, next) => {
   try {
+  
     let billID = req.params.id;
-    let queryOption = {};
-    queryOption.id = billID;
- 
-    let billData = await Bill.findOne({
-      where: queryOption,
-      include: User,
-    });
    
+    // let queryOption = {};
+    // queryOption.id = billID;
+   
+    let billData = await Bill.findOne({
+    
+      where: {
+        id:billID,
+      },
+      include: ["bill_pay_by","bill_operate_by", Renting],
+    });
+  
     if (billData!=null) {
       billData.image_path = billImageTranformer(billData.image_path);
     }
+   
 
     return res.status(200).json({
       data: billData,

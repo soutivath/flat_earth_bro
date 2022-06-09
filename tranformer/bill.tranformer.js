@@ -23,7 +23,19 @@ exports.bills = (data)=>{
             is_pay: bill.is_pay,
             renting_id: bill.renting_id,
             is_user_read: bill.is_user_read,
-            pay_by: bill.pay_by,
+           // pay_by: bill.pay_by,
+           bill_pay_by: {
+            id: 3,
+            name: bill.bill_pay_by.name,
+            phoneNumber: bill.bill_pay_by.phoneNumber,
+            personal_card_no: bill.bill_pay_by.personal_card_no,
+        },
+        bill_operate_by: {
+            id: 1,
+            name: bill.bill_operate_by.name,
+            phoneNumber: bill.bill_operate_by.phoneNumber,
+            personal_card_no: bill.bill_operate_by.personal_card_no,
+        },
             createdAt: bill.createdAt,
             updatedAt: bill.updatedAt
             
