@@ -21,6 +21,7 @@ export const payRentSchema = Joi.object({
       renting_detail_id:Joi.number().integer().required(),
       trash_pay:Joi.boolean().required(),
       renting_pay:Joi.boolean().required(),
+      fine:Joi.number().integer().required()
     })
   ).required(),
   renting_id:Joi.number().integer(),
@@ -38,6 +39,7 @@ export const checkOutSchema = Joi.object({
   renting_pay_by:Joi.number().integer(),
   pay_last_renting:Joi.boolean(),
   amount:Joi.number().integer(),
+  fine:Joi.number().integer(),
 
   
 });

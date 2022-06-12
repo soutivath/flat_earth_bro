@@ -1,5 +1,5 @@
 import {User} from '../models';
-export const isAdmin = async(req,res,next)=>{
+export const isSuperAdmin = async(req,res,next)=>{
     if(!req.user){
         return res.status(401).send({message:"unauth"});
     }

@@ -679,6 +679,36 @@ exports.payRent = async (req, res, next) => {
         totalPrice += parseInt(allTrashPrice);
       }
 
+      if(eachRenitngDetail.fine!=0){
+        await PaymentDetail.create(
+          {
+            name:
+              date.format(
+                date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                "M"
+              ) -
+                1 ==
+              "0"
+                ? payment_detail_enum.FINE.LA + "ເດືອນ " + "12"
+                : payment_detail_enum.FINE.LA +
+                  "ເດືອນ " +
+                  (
+                    date.format(
+                      date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                      "M"
+                    ) - 1
+                  ).toString(),
+            price: eachRenitngDetail.fine,
+            type: payment_detail_enum.FINE.EN,
+            payment_id: payment.id,
+          },
+          {
+            transaction: t,
+          }
+        );
+        totalPrice += parseInt(eachRenitngDetail.fine);
+      }
+
       if (
         date.isSameDay(
           date.parse(renting_detail.end_date, "YYYY-MM-DD"),

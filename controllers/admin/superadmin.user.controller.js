@@ -5,8 +5,11 @@ import {
   adminAddUserSchema,
 } from "../../validators/admins/user.validator";
 import fs from "fs";
+import {Op} from "sequelize";
 import createHttpError from "http-errors";
+import {userTranformer} from "../../tranformer/user.tranformer";
 
+import {randomTopicString} from "../../libs/utils/randomString";
 exports.editUser = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
@@ -19,6 +22,24 @@ exports.editUser = async (req, res, next) => {
     if (!user) {
       throw createHttpError(404, "User not found");
     }
+
+    const checkUser = await User.findOne({
+      where: {
+        phoneNumber: validatedResult.phoneNumber,
+      },
+    });
+    if (checkUser) {
+      throw createHttpError(400, "Phone number already exists");
+    }
+
+    const checkPersonalCardNo = await User.findOne({
+      where: {
+        phoneNumber: validatedResult.phoneNumber,
+      }});
+      if (checkPersonalCardNo) {
+        throw createHttpError(400, "personal card number is already exists");
+      }
+
 
     let profilePath = user.getProfilePath();
 
@@ -35,7 +56,7 @@ exports.editUser = async (req, res, next) => {
 
     const updatedUser = await User.update(option, {
       where: {
-        id: raq.params.id,
+        id: req.params.id,
       },
       transaction: t,
     });
@@ -47,7 +68,7 @@ exports.editUser = async (req, res, next) => {
     await t.commit();
     return res.status(200).json({
       data: updatedUser,
-      message: "updated admin successfully",
+      message: "updated user successfully",
       success: true,
     });
   } catch (error) {
@@ -77,6 +98,14 @@ exports.addAdmin = async (req, res, next) => {
       throw createHttpError(400, "Phone number already exists");
     }
 
+    const checkPersonalCardNo = await User.findOne({
+      where: {
+        phoneNumber: validatedResult.phoneNumber,
+      }});
+      if (checkPersonalCardNo) {
+        throw createHttpError(400, "personal card number is already exists");
+      }
+
     const newAdmin = await User.create(
       {
         name: validatedResult.name,
@@ -93,8 +122,8 @@ exports.addAdmin = async (req, res, next) => {
     await Account.create({
         phoneNumber:validatedResult.phoneNumber,
         notification_topic: randomTopicString(),
-        user_id:newAdmin,
-      
+        user_id:newAdmin.id,
+        display_name:validatedResult.name,
     },
     {
         transaction: t,
@@ -104,7 +133,7 @@ exports.addAdmin = async (req, res, next) => {
     await t.commit();
     return res.status(201).json({
       data: newAdmin,
-      message: "Create admin successfully",
+      message: "Create user successfully",
       success: true,
     });
   } catch (error) {
@@ -117,6 +146,7 @@ exports.addAdmin = async (req, res, next) => {
 };
 
 exports.deleteUser = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
     const userId = req.params.id;
     if(req.user.user_id == userId){
@@ -125,17 +155,28 @@ exports.deleteUser = async (req, res, next) => {
     const user = await User.findByPk(userId);
     const userImagePath = user.getProfilePath();
 
-    await user.destroy();
+    await Account.destroy({
+      where:{
+        user_id:userId,
+      }
+    },{
+      transaction: t,
+    });
+
+    await user.destroy({
+      transaction: t,
+    });
     try {
       fs.unlinkSync(userImagePath);
     } catch (err) {}
-
+    await t.commit();
     return res.status(200).json({
       data: [],
       success: true,
       message: "Delete user successfully",
     });
   } catch (err) {
+    await t.rollback();
     next(err);
   }
 };
@@ -143,14 +184,19 @@ exports.deleteUser = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
   try {
     let option = {};
-    if (req.query.isAdmin === "true") {
-      option.is_admin = { [Op.ne]: "user" };
-    } else if (req.query.isAdmin === "false") {
+    if(req.query.isAdmin=="superadmin"){
+      option.is_admin = "superadmin";
+    }
+    else if (req.query.isAdmin=="admin") {
+      option.is_admin = "admin";
+    } else if (req.query.isAdmin=="user" ) {
       option.is_admin = "user";
     }
     const userData = await User.findAll({
       where: option,
+      include:Account
     });
+   
     const tranformedData = userTranformer(userData);
     return res
       .status(200)

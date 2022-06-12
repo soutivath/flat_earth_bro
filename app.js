@@ -52,7 +52,7 @@ app.use(async ()=>{
 });
 
 const port = process.env.PORT || 3000;
-const ip = process.env.IP || "25.41.87.205";
+const ip = process.env.IP || "localhost";
 const server = app.listen(port,ip,async()=>{
     await sequelize.authenticate();
     console.log("DB is running on port "+port);

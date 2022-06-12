@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.RentingDetail,{foreignKey: 'rentingdetails_id',as:"rentingdetails"});
 
      // this.hasMany(models.Account,{foreignKey:'user_id'});
+
+     this.belongsTo(models.User,{foreignKey:"pay_by",as:"trash_pay_by",onDelete:"SET NULL"});
+     this.belongsTo(models.User,{foreignKey:"operate_by",as:"trash_operate_by",onDelete:"SET NULL"});
+     
     }
   }
   Trash.init({
@@ -22,6 +26,8 @@ module.exports = (sequelize, DataTypes) => {
     trash_pay_amount:DataTypes.INTEGER,
     rentingdetails_id: DataTypes.INTEGER,
     proof_of_payment:DataTypes.STRING,
+    pay_by:DataTypes.INTEGER,
+    operate_by:DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Trash',

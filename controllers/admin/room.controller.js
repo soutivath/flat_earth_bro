@@ -71,6 +71,7 @@ exports.post = async (req, res, next) => {
       electric_motor_number:validateResult.electric_motor_number,
       water_motor_number:validateResult.water_motor_number,
       type_id: validateResult.type_id,
+      is_active:false
     });
     return res.status(200).json({
       success: true,

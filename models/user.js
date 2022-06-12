@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
      this.hasMany(models.Bill,{foreignKey:"pay_by",as:"bill_pay_by",onDelete:"SET NULL"});
      this.hasMany(models.Bill,{foreignKey:"operate_by",as:"bill_operate_by",onDelete:"SET NULL"});
 
+     this.hasMany(models.Trash,{foreignKey:"pay_by",as:"trash_pay_by",onDelete:"SET NULL"});
+     this.hasMany(models.Trash,{foreignKey:"operate_by",as:"trash_operate_by",onDelete:"SET NULL"});
+     this.hasMany(models.RentingDetail,{foreignKey:"pay_by",as:"renting_pay_by",onDelete:"SET NULL"});
+     this.hasMany(models.RentingDetail,{foreignKey:"operate_by",as:"renting_operate_by",onDelete:"SET NULL"});
+
      //this.hasMany(models.RentingDetail,{foreignKey:"trash_pay_by",as:"trash_pay",onDelete:"SET NULL"});
    //  this.hasMany(models.Trash,{foreignKey:"trash_pay_by"});
 

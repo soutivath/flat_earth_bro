@@ -12,6 +12,7 @@ import roomRouteAdmin from "./admin/room.Route";
 import trashRouteAdmin from "./admin/trash.Route";
 import typeRouteAdmin from "./admin/type.Route";
 import userRouteAdmin from "./admin/user.Route";
+import superAdminRouteAdmin from "./admin/superadmin.Route";
 //----------------------------------->
 
 //------------------user
@@ -31,6 +32,7 @@ import option from "./admin/setting.Route";
 
 import { Auth } from '../middlewares/auth.guard';
 import {isAdmin} from '../middlewares/isAdmin.guard'
+import {isSuperAdmin} from '../middlewares/isSuperAdmin.guard'
  const app = express();
 
  
@@ -42,6 +44,7 @@ app.use("/admin",[Auth,isAdmin],roomRouteAdmin);
 app.use("/admin",[Auth,isAdmin],trashRouteAdmin);
 app.use("/admin",[Auth,isAdmin],typeRouteAdmin);
 app.use("/admin",[Auth,isAdmin],userRouteAdmin);
+app.use("/superadmin",[Auth,isSuperAdmin],superAdminRouteAdmin);
 
 app.use('/admin',[Auth,isAdmin],option);
 

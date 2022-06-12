@@ -25,6 +25,24 @@ module.exports = {
           onDelete:"CASCADE"
         }
       },
+      pay_by:{
+        type:Sequelize.INTEGER,
+        allowNull:true,
+        references:{
+          model:'users',
+          key:'id',
+          onDelete:"CASCADE"
+        }
+      },
+      operate_by:{
+        type:Sequelize.INTEGER,
+        allowNull:true,
+        references:{
+          model:'users',
+          key:'id',
+          onDelete:"CASCADE"
+        }
+      },
       proof_of_payment:{
         allowNull: true,
         type:Sequelize.STRING,
