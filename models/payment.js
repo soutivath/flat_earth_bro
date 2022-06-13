@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     total: DataTypes.INTEGER,
     renting_id: DataTypes.INTEGER,
     operate_by:DataTypes.INTEGER,
-    pay_date:DataTypes.INTEGER,
+    pay_date:DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Payment',

@@ -45,8 +45,10 @@ app.use("/admin",[Auth,isAdmin],trashRouteAdmin);
 app.use("/admin",[Auth,isAdmin],typeRouteAdmin);
 app.use("/admin",[Auth,isAdmin],userRouteAdmin);
 app.use("/superadmin",[Auth,isSuperAdmin],superAdminRouteAdmin);
+app.use("/superadmin",[Auth,isSuperAdmin],superAdminRouteAdmin);
 
-app.use('/admin',[Auth,isAdmin],option);
+
+app.use('/superadmin',[Auth,isSuperAdmin],option);
 
 app.use("/user",[Auth],authRouteUser);
 app.use("/user",[Auth],profileRouteUser);

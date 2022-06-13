@@ -130,10 +130,11 @@ exports.checkIn = async (req, res, next) => {
         {
           end_date: nextDate,
           renting_id: renting.id,
-          is_trash_pay: paidType.PAID,
           is_renting_pay: paidType.PAID,
           renting_pay_amount: roomPrice,
           proof_of_payment: payment_no,
+          pay_by:validateResult.renting_pay_by,
+          operate_by:req.user.id
         },
         {
           transaction: t,
@@ -164,6 +165,7 @@ exports.checkIn = async (req, res, next) => {
             rentingdetails_id: rentingID.id,
             is_trash_pay: paidType.PAID,
             pay_by: validateResult.renting_pay_by,
+            operate_by:req.user.id,
             trash_pay_amount: trash_price,
             proof_of_payment: payment.id,
           },
@@ -262,6 +264,8 @@ exports.checkIn = async (req, res, next) => {
               is_renting_pay: paidType.PAID,
               renting_pay_amount: roomPrice,
               proof_of_payment: payment_no,
+              pay_by:validateResult.renting_pay_by,
+              operate_by:req.user.id
             },
             {
               transaction: t,
@@ -298,6 +302,8 @@ exports.checkIn = async (req, res, next) => {
                 is_trash_pay: paidType.PAID,
                 trash_pay_amount: trash_price,
                 proof_of_payment: payment.id,
+                pay_by:validateResult.renting_pay_by,
+                operate_by:req.user.id
               },
               {
                 transaction: t,
@@ -809,7 +815,8 @@ exports.payRent = async (req, res, next) => {
               end_date: aEndDate,
               is_renting_pay: paidType.PAID,
               renting_pay_amount: roomPrice,
-              renting_pay_by: validateResult.renting_pay_by,
+              pay_by: validateResult.renting_pay_by,
+              operate_by:req.user.id,
               proof_of_payment: payment_no,
             },
             {
@@ -846,6 +853,8 @@ exports.payRent = async (req, res, next) => {
                 is_trash_pay: paidType.PAID,
                 trash_pay_amount: allTrashPrice,
                 proof_of_payment: payment.id,
+                pay_by:validateResult.renting_pay_by,
+                operate_by:req.user.id
               },
               {
                 transaction: t,
@@ -1453,14 +1462,14 @@ exports.getRentingDetail = async (req, res, next) => {
 exports.getAllRentingDetail = async (req, res, next) => {
   try {
     let option = [];
-    if (req.query.isTrashPay === "true") {
-      option.push({ is_trash_pay: paidType.PAID });
-      //option.is_trash_pay =true;
-    }
-    if (req.query.isTrashPay === "false") {
-      // option.is_trash_pay =false;
-      option.push({ is_trash_pay: paidType.UNPAID });
-    }
+    // if (req.query.isTrashPay === "true") {
+    //   option.push({ is_trash_pay: paidType.PAID });
+    //   //option.is_trash_pay =true;
+    // }
+    // if (req.query.isTrashPay === "false") {
+    //   // option.is_trash_pay =false;
+    //   option.push({ is_trash_pay: paidType.UNPAID });
+    // }
     if (req.query.isRentingPay === "true") {
       // option.is_renting_pay =true;
       option.push({ is_renting_pay: paidType.PAID });
@@ -1474,7 +1483,7 @@ exports.getAllRentingDetail = async (req, res, next) => {
       where: {
         [Op.and]: option,
       },
-      include: ["trash_pay", "renting_pay"],
+      include: ["renting_pay_by", "renting_operate_by"],
     });
     return res.status(200).json({
       data: rentingDetailData,
@@ -1487,6 +1496,29 @@ exports.getAllRentingDetail = async (req, res, next) => {
 };
 
 exports.addContract = async (req, res, next) => {
+  const image = req.files[0];
+  const renting_id = req.params.id;
+  const t = await sequelize.transaction();
   try {
-  } catch (err) {}
+    if (!image) {
+      throw createHttpError(400, "Image not found");
+    }
+    let checkRenting = await Renting.findByPk(renting_id);
+    if (!checkRenting) {
+      throw createHttpError(400, "Renting not found");
+    }
+    checkRenting.contract_path = image.filename;
+    await checkRenting.save({transaction:t});
+
+    await t.commit();
+
+    return res.status(200).json({
+      data: checkRenting,
+      message: "Add contract successfully",
+      success: true,
+    });
+  } catch (err) {
+    await t.rollback();
+    next(err);
+  }
 };
