@@ -134,7 +134,9 @@ exports.checkIn = async (req, res, next) => {
           renting_pay_amount: roomPrice,
           proof_of_payment: payment_no,
           pay_by:validateResult.renting_pay_by,
-          operate_by:req.user.id
+          
+          operate_by:req.user.id,
+          fine:0
         },
         {
           transaction: t,
@@ -265,7 +267,8 @@ exports.checkIn = async (req, res, next) => {
               renting_pay_amount: roomPrice,
               proof_of_payment: payment_no,
               pay_by:validateResult.renting_pay_by,
-              operate_by:req.user.id
+              operate_by:req.user.id,
+              fine:0
             },
             {
               transaction: t,
@@ -603,6 +606,7 @@ exports.payRent = async (req, res, next) => {
             is_renting_pay: paidType.PAID,
             renting_pay_amount: roomPrice,
             proof_of_payment: payment_no,
+            fine:eachRenitngDetail.fine
           },
           {
             where: {
@@ -638,6 +642,7 @@ exports.payRent = async (req, res, next) => {
             transaction: t,
           }
         );
+      
         totalPrice += parseInt(roomPrice);
       }
 
@@ -685,7 +690,7 @@ exports.payRent = async (req, res, next) => {
         totalPrice += parseInt(allTrashPrice);
       }
 
-      if(eachRenitngDetail.fine!=0){
+      if(parseInt(eachRenitngDetail.fine)!=0){
         await PaymentDetail.create(
           {
             name:
@@ -818,6 +823,7 @@ exports.payRent = async (req, res, next) => {
               pay_by: validateResult.renting_pay_by,
               operate_by:req.user.id,
               proof_of_payment: payment_no,
+              fine:0
             },
             {
               transaction: t,

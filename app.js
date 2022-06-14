@@ -10,14 +10,14 @@ import helmet from 'helmet';
 import cors from 'cors';
 
 import initializeFirebaseSDK from "./libs/firebase/firebase_connector";
+// var bodyParser = require('body-parser')
 
-
-
+const upload = require('multer')();
 require('dotenv').config();
 require('./libs/utils/passportJWT');
 
 const app = express();
-
+//app.use(bodyParser.json())
 app.use(helmet());
 app.use(cors());
 app.use(passport.initialize());
@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 initializeFirebaseSDK();
-app.use("/api",indexRouter);
+app.use("/api",[upload.any()],indexRouter);
 
 
 

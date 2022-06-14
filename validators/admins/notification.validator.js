@@ -7,5 +7,6 @@ export const sendNotificationSchema = Joi.object({
 export const sendAllNotificationSchema = Joi.object({
     "title":Joi.string().required(),
     "message":Joi.string().required(),
+    "detail":Joi.string().required()
    
 });

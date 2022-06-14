@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   GlobalNotification.init({
     title: DataTypes.STRING,
-    message: DataTypes.STRING
+    message: DataTypes.STRING,
+    detail: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'GlobalNotification',

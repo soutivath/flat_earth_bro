@@ -9,7 +9,6 @@
     "dev": "nodemon --exec node_modules/.bin/babel-node app.js",
     "migrate:refresh": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate",
     "migrate:refresh:seed": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all"
-   
   },
   "keywords": [],
   "author": "",
@@ -20,7 +19,7 @@
     "@babel/preset-env": "^7.16.11",
     "babel-preset-env": "^1.7.0",
     "bcrypt": "^5.0.1",
-    "body-parser": "^1.19.1",
+    "body-parser": "^1.20.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-and-time": "^2.1.2",

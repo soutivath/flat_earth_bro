@@ -112,7 +112,8 @@ exports.sendGlobalNotification = async (req, res, next) => {
 
     await GlobalNotification.create({
         title:validationResult.title,
-        message:validationResult.message
+        message:validationResult.message,
+        detail:validationResult.detail
     });
     admin
       .messaging()
@@ -178,7 +179,7 @@ exports.getNotificationByUser = async (req,res,next)=>{
       where:{
         id:userID
       },
-      include:Notification
+      include:"notification"
     });
     return res.status(200).json({
       data:userWithNotification,
@@ -224,7 +225,7 @@ exports.deleteNotification = async (req,res,next)=>{
 exports.deleteGlobalNotification = async (req,res,next)=>{
   try{
     const globalNotificaion_id = req.params.id;
-    await Notification.destroy({
+    await GlobalNotification.destroy({
       where:{
         id:globalNotificaion_id,
       }
@@ -235,6 +236,24 @@ exports.deleteGlobalNotification = async (req,res,next)=>{
       success: true,
     });
 
+  }catch(err){
+    next(err);
+  }
+}
+
+
+exports.showGlobalNotification = async (req,res,next)=>{
+  try{
+    const id = req.params.id;
+    const notifiation = await GlobalNotification.findAll({
+      where:{
+        id:id
+      }
+    });
+    return res.status(200).json({
+      data:notifiation,
+      message:"Get notification successfully"
+    });
   }catch(err){
     next(err);
   }
