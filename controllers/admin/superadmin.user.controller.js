@@ -30,6 +30,9 @@ exports.editUser = async (req, res, next) => {
     const checkUser = await User.findOne({
       where: {
         phoneNumber: validatedResult.phoneNumber,
+        id:{
+          [Op.ne]:req.user.id
+        }
       },
     });
     if (checkUser) {
@@ -38,7 +41,10 @@ exports.editUser = async (req, res, next) => {
 
     const checkPersonalCardNo = await User.findOne({
       where: {
-        phoneNumber: validatedResult.phoneNumber,
+        phoneNumber: validatedResult.personal_card_no,
+        id:{
+          [Op.ne]:req.user.id
+        }
       }});
       if (checkPersonalCardNo) {
         throw createHttpError(400, "personal card number is already exists");
