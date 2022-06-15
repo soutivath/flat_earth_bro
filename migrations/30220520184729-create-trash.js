@@ -58,6 +58,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Trashes');
+    await queryInterface.dropTable('trashes');
   }
 };
