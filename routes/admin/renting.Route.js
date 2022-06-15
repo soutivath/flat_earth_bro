@@ -1,12 +1,13 @@
 import express from "express";
 import {contractUpload} from "../../middlewares/multer";
 const router = express.Router();
+const upload = require('multer')();
 import renting from "../../controllers/admin/renting.controller";
-router.post("/checkIn",renting.checkIn);
-router.post("/payRent",renting.payRent);
-router.post("/addPeople",renting.addPeople);
-router.post("/checkOut",renting.checkOut);
-router.post("/removePeople",renting.removePeople);
+router.post("/checkIn",upload.any(),renting.checkIn);
+router.post("/payRent",upload.any(),renting.payRent);
+router.post("/addPeople",upload.any(),renting.addPeople);
+router.post("/checkOut",upload.any(),renting.checkOut);
+router.post("/removePeople",upload.any(),renting.removePeople);
 
 //router.get('/one-renting/:id',renting.oneRenting);
 

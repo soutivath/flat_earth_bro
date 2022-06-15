@@ -12,7 +12,7 @@ import cors from 'cors';
 import initializeFirebaseSDK from "./libs/firebase/firebase_connector";
 // var bodyParser = require('body-parser')
 
-const upload = require('multer')();
+
 require('dotenv').config();
 require('./libs/utils/passportJWT');
 
@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 initializeFirebaseSDK();
-app.use("/api",[upload.any()],indexRouter);
+app.use("/api",indexRouter);
 
 
 

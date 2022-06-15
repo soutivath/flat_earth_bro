@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-
+const upload = require('multer')();
 import notification from "../../controllers/admin/notification.controller";
 
 
@@ -12,8 +12,8 @@ router.get("/getAllGlobalNotification",notification.getAllGlobalNotification);
 router.get("/getNotificationByUser/:id",notification.getNotificationByUser);
 router.get("/showNotification/:id",notification.showNotification);
 router.get("/getAllNotification",notification.getAllNotification);
-router.post("/sendGlobalNotification",notification.sendGlobalNotification);
-router.post("/sendNotification",notification.sendNotification);
+router.post("/sendGlobalNotification",upload.any(),notification.sendGlobalNotification);
+router.post("/sendNotification",upload.any(),notification.sendNotification);
 router.get("/showGlobalNotification/:id",notification.showGlobalNotification);
 
 export default router;

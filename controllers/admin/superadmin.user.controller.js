@@ -23,6 +23,10 @@ exports.editUser = async (req, res, next) => {
       throw createHttpError(404, "User not found");
     }
 
+    if(user.is_admin=="superadmin"&&req.user.is_admin!="superadmin"){
+      throw createHttpError(403,"You don't have permission to edit this user");
+    }
+
     const checkUser = await User.findOne({
       where: {
         phoneNumber: validatedResult.phoneNumber,
@@ -98,6 +102,10 @@ exports.addAdmin = async (req, res, next) => {
       throw createHttpError(400, "Phone number already exists");
     }
 
+    if(req.user.is_admin!="superadmin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin== "admin")){
+      throw createHttpError(403, "permission denied");
+    }
+
     const checkPersonalCardNo = await User.findOne({
       where: {
         phoneNumber: validatedResult.phoneNumber,
@@ -150,9 +158,17 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
     if(req.user.user_id == userId){
-        throw createHttpError(400,"You cannot delete ur account");
+    
+      throw createHttpError(400,"You cannot delete ur account");
     }
     const user = await User.findByPk(userId);
+
+    if(req.user.is_admin!="superadmin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin== "admin")){
+    
+      throw createHttpError(403, "permission denied");
+    }
+
+
     const userImagePath = user.getProfilePath();
 
     await Account.destroy({

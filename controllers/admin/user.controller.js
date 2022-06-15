@@ -1,4 +1,4 @@
-import { sequelize,User,Notification } from "../../models";
+import { sequelize,User,Notification,Account } from "../../models";
 
 import {randomTopicString} from "../../libs/utils/randomString";
 import {postEditAdminSchema,addUserSchema,adminAddUserSchema} from "../../validators/admins/user.validator";

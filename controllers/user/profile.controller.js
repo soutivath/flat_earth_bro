@@ -1,8 +1,8 @@
-import { sequelize, User } from "../../models";
+import { sequelize, User,Account } from "../../models";
 import { profileValidator } from "../../validators/users/profile.validator";
 import { hashPassword, compareHashPassword } from "../../libs/utils/bcrypt";
 import createHttpError from "http-errors";
-import userImage from "../../tranformer/images/user.tranformer";
+import {userImage,displayImage} from "../../tranformer/images/user.tranformer";
 import fs from "fs";
 import * as admin from "firebase-admin";
 
@@ -14,18 +14,17 @@ exports.editProfile = async (req, res, next) => {
       where: {
         id: req.user.id,
       },
+      include:Account
     });
 
-    let profilePath = user.getProfilePath();
-    
-  
-
+    let profilePath = user.Account.getDisplayImagePath();
+   
     let option = {};
 
     let image = req.files[0];
     if (image) {
     
-      option.image = req.files[0].filename;
+      option.display_image = req.files[0].filename;
     }
 
     if (validatedResult.name) {
@@ -36,9 +35,9 @@ exports.editProfile = async (req, res, next) => {
     let newUpdateUser = null;
 
     if (option != {}) {
-      const updatedUser = await User.update(option, {
+     await Account.update(option, {
         where: {
-          id: req.user.id,
+          user_id: req.user.id,
         },
         
       });
@@ -49,7 +48,8 @@ exports.editProfile = async (req, res, next) => {
       }
 
       newUpdateUser = await User.findOne({
-        where: { id:updatedUser },
+        where: { id:user.id },
+        include:Account
       });
     }
 
@@ -172,10 +172,14 @@ exports.getCurrentProfile = async (req, res, next) => {
       where: {
         id: currentAuthId,
       },
+      include:Account,
       plain: true,
     });
     const imageFullPath = userImage(currentUserData.image);
+    const displayImageFullPath = displayImage(currentUserData.Account.display_image);
+    
     currentUserData.image = imageFullPath;
+    currentUserData.Account.display_image = displayImageFullPath;
     return res.status(200).json({
       data: currentUserData,
       message: "get data successfully",

@@ -1,7 +1,7 @@
 import express from "express";
 import superadmin from "../../controllers/admin/superadmin.user.controller";
 import {profileUpload as uploader} from "../../middlewares/multer";
-
+const upload = require('multer')();
 const router = express.Router();
 router.put("/editAdmin/:id",uploader.array("profile_image",1),superadmin.editUser);
 router.post("/addAdmin",uploader.array("profile_image",1),superadmin.addAdmin);

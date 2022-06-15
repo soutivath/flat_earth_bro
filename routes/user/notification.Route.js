@@ -2,9 +2,10 @@ import express from "express";
 import noticationController from "../../controllers/user/notification_option.controller";
 
 const router = express.Router();
+const upload = require('multer')();
+router.get("/notification",noticationController.getCurrentNotification);
 
-router.post("notification",noticationController.updateCurrentNotificationSetting);
-
-router.get('notification',noticationController.getCurrentNotificationSetting);
+router.get('/global-notification',noticationController.getGlobalCurrentNotification);
+router.post('/notification-setting',upload.any(),noticationController.changeNotification);
 
 export default router;

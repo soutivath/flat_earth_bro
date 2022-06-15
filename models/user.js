@@ -56,5 +56,6 @@ module.exports = (sequelize, DataTypes) => {
     let dir = `${appDir}/public/images/resources/profile_images/${this.image}`;
     return dir
   }
+  
   return User;
 };

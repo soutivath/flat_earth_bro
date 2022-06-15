@@ -1,9 +1,9 @@
 import express from "express";
 import auth from "../../controllers/user/authentication.controller";
-import {profileUpload as uploader} from "../../middlewares/multer";
+import {displayImageUpload as uploader} from "../../middlewares/multer";
 const router = express.Router();
-
-router.post("/register",[uploader.array("profile_image",1)],auth.register);
-router.post("/login",auth.login);
+const upload = require('multer')();
+router.post("/register",[uploader.array("display_image",1)],auth.register);
+router.post("/login",upload.any(),auth.login);
 
 export default router;

@@ -1,5 +1,5 @@
 
-import { sequelize, User ,Notification} from "../../models";
+import { sequelize, User,Account } from "../../models";
 import {
   registerUserSchema,
   loginUserSchema,
@@ -28,14 +28,14 @@ exports.register = async (req, res, next) => {
       where: {
         phoneNumber: validatedResult.phoneNumber,
       },
+      include:Account
     });
     if (!user) {
-      return res.status(400).json({
-        message:
-          "This phone number not match in ours record please contect owner",
-        data: [],
-        success: false,
-      });
+     throw createHttpError(404, "User not found");
+    }
+    
+    if(user.Account.password!=null){
+      throw createHttpError(400, "This account already exists");
     }
    
     //check OTP bro -------------->
@@ -71,32 +71,38 @@ exports.register = async (req, res, next) => {
 
     //--------------------------->
     const hashedPassword = hashPassword(validatedResult.password);
-    const updatedUserPassword = await User.update(
+    await Account.update(
       {
         password: hashedPassword,
-        image: imageProfile,
-        firebase_uid: uid,
+        display_image: imageProfile,
+        uid: uid,
         display_name: validatedResult.display_name,
+        global_option:1,
+        personal_option:1
       },
       {
         where: {
-          phoneNumber: validatedResult.phoneNumber,
+          user_id: user.id,
         },
-      },
-      {
         transaction: t,
-      }
+      },
     );
+  
+
     const payload = {
-      id: updatedUserPassword.id,
-      phoneNumber: updatedUserPassword.phoneNumber,
+      account_id:user.Account.id,
+      user_id: user.id,
+      phoneNumber: user.phoneNumber,
+      name: user.name,
+      display_name: validatedResult.display_name,
+      is_admin: user.is_admin,
     };
 
     admin
       .messaging()
-      .subscribeToTopic([validatedResult.firebaseFCM], user.notification_topic)
+      .subscribeToTopic([validatedResult.firebaseFCM], user.Account.notification_topic)
       .then((response) => {
-        console.log(`${user.name} is subscribeToTopic  ${user.notification_topic}`)
+        console.log(`${user.name} is subscribeToTopic  ${user.Account.notification_topic}`)
         console.log("Successfully subscribed to topic:", response);
       })
       .catch((error) => {
@@ -116,13 +122,7 @@ exports.register = async (req, res, next) => {
         console.log("Error subscribing to topic:", error);
       });
 
-      await Notification.create({
-        user_id:user.id,
-        global_option:true,
-        personal_option:true,
-      },{
-        transaction:t
-      });
+    
 
     const accessToken = JWT.genAccessJWT(payload);
     const refreshToken = JWT.genRefreshJWT(payload);
@@ -171,6 +171,7 @@ exports.login = async (req, res, next) => {
       where: {
         phoneNumber: validatedResult.phoneNumber,
       },
+      include:Account
     });
     if (!user) {
       return res.status(400).json({
@@ -179,7 +180,7 @@ exports.login = async (req, res, next) => {
         data: [],
       });
     }
-    if (user.password == null) {
+    if (user.Account.password == null) {
       return res.status(400).json({
         message: "This phone number saved in our record but not registered",
         success: false,
@@ -188,13 +189,17 @@ exports.login = async (req, res, next) => {
     }
     const isPasswordMatch = compareHashPassword(
       validatedResult.password,
-      user.password
+      user.Account.password
     );
 
     if (isPasswordMatch) {
       const payload = {
-        id: user.id,
+        account_id:user.Account.id,
+        user_id: user.id,
         phoneNumber: user.phoneNumber,
+        name: user.name,
+        display_name: user.Account.display_name,
+        is_admin: user.is_admin,
       };
       const accessToken = JWT.genAccessJWT(payload);
       const refreshToken = JWT.genRefreshJWT(payload);
@@ -214,5 +219,6 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
 
 

@@ -1,5 +1,8 @@
 
 import * as admin from "firebase-admin";
+import createHttpError from "http-errors";
+import {User,sequelize,Account} from "../../models/";
+import { hashPassword, compareHashPassword } from "../../libs/utils/bcrypt";
 exports.resetPassword = async (req, res, next) => {
     try {
       const body = req.body;
@@ -7,13 +10,13 @@ exports.resetPassword = async (req, res, next) => {
       //   throw createHttpError.BadRequest("old_password is required");
       // }
       if(!body.new_password){
-        throw createHttpError.BadRequest("new_password is required");
+        throw createHttpErrorError.BadRequest("new_password is required");
       }
       if(!body.phone_number){
         throw createHttpError.BadRequest("phone number is required");
       }
       if(!body.firebaseToken){
-        throw createHttpError.BadRequest("Firebase token is required");
+        throw createHttpError.BadRequest("firebaseToken is required");
       }
       let phoneNumber = body.phone_number;
       const decodedToken = await admin
@@ -25,30 +28,31 @@ exports.resetPassword = async (req, res, next) => {
      }
       let uid = decodedToken.uid;
   
-      const user = await User.findOne({
+      const account = await Account.findOne({
         where: {
-          firebase_uid: uid,
+          uid: uid,
         },
       });
+      if(!account) throw createHttpError.NotFound("Account not found");
       // const isPasswordMatch = compareHashPassword(body.old_password, user.password);
       // if (!isPasswordMatch) {
       //   throw createHttpError(403, "Invalid password");
       // }
       const hashedPassword = hashPassword(body.new_password);
-      await User.update(
+      await Account.update(
         {
           password: hashedPassword,
         },
         {
           where: {
-            id: req.user.id,
+            id:account.id,
           },
         }
       );
   
   
       return res.status(200).json({
-        data: user,
+        data: [],
         message: "Update password successfully",
         success: true,
       });

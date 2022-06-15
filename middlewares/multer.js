@@ -48,6 +48,21 @@ const profileStorage = multer.diskStorage({
   },
   filename: fileName,
 });
+const displayProfileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let dir = `${appDir}/public/images/resources/display_images`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+    req.files[0].floderName = dir;
+    
+  }
+
+  cb(null, dir);
+
+
+  },
+  filename: fileName,
+});
 
 
 
@@ -154,5 +169,9 @@ export const testUpload = multer({
 });
 export const contractUpload = multer({
   storage: contractStorage,
+  fileFilter: fileFilter,
+});
+export const displayImageUpload = multer({
+  storage: displayProfileStorage,
   fileFilter: fileFilter,
 });

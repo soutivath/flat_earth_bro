@@ -1,4 +1,5 @@
 'use strict';
+const { dirname } = require("path");
 const {
   Model
 } = require('sequelize');
@@ -23,10 +24,19 @@ module.exports = (sequelize, DataTypes) => {
     uid:DataTypes.STRING,
     display_name:DataTypes.STRING,
     user_id: DataTypes.INTEGER,
+    display_image:DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Account',
     tableName:'accounts'
   });
+
+  Account.prototype.getDisplayImagePath = function(){
+    
+    const appDir = dirname(require.main.filename);
+    let dir = `${appDir}/public/images/resources/display_image/${this.display_image}`;
+    return dir
+  }
+
   return Account;
 };

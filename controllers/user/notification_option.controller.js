@@ -1,14 +1,23 @@
 
-import { sequelize, User ,Notification,Account,} from "../../models";
+import { sequelize, User ,Account,Notification,GlobalNotification} from "../../models";
 import GLOBAL_TOPIC from "../../constants/notificationTopic";
 import notificationUpdateSchema from "../../validators/users/notificationUpdate.validator";
-import notification from "../../models/notification";
+
 import * as admin from "firebase-admin";
-exports.getCurrentNotificationSetting = async (req,res,next) => {
+import createHttpError from "http-errors";
+exports.getCurrentNotification = async (req,res,next) => {
     try{
         const notificationData = await Notification.findOne({
             where:{
                 id:req.user.id
+            }
+        });
+
+        await Notification.update({
+            is_read:1
+        },{
+            where:{
+                user_id:req.user.id
             }
         });
         return res.status(200).json({
@@ -20,39 +29,46 @@ exports.getCurrentNotificationSetting = async (req,res,next) => {
         next(err);
     }
 }
+exports.getGlobalCurrentNotification = async (req,res,next) => {
+    try{
+        const notificationData = await GlobalNotification.findAll();
+        return res.status(200).json({
+            message:"Get data successfully",
+            data:notificationData,
+            success:true
+        });
+    }catch(err){
+        next(err);
+    }
+}
 
-exports.updateCurrentNotificationSetting = async (req,res,next)=>{
+exports.changeNotification = async (req,res,next)=>{
     const t = await sequelize.transaction();
     try{
         const validatedResult  = await notificationUpdateSchema.validateAsync(req.body);
-        let userWitNotificationData = await User.findOne({
+        let account = await Account.findOne({
             where:{
-                id:req.user.id
+               user_id:req.user.id
             },
-            include:Notification
+        
         });
-        if(!userWitNotificationData){
-            await t.rollback();
-            return res.status(404).json({
-                message:"Data not found",
-                data:[],
-                success:false 
-            })
+        if(!account){
+           throw createHttpError.NotFound("Account not found");
         }
     
-       if(validatedResult.personal_option!=notificationData.personal_option){
+       if(validatedResult.personal_option!=account.personal_option){
            if(validatedResult.personal_option){
             await admin
             .messaging()
-            .subscribeToTopic([validatedResult.firebaseFCM], user.notification_topic);
+            .subscribeToTopic([validatedResult.firebaseFCM], account.notification_topic);
            }
            else{
             await admin
             .messaging()
-            .unsubscribeFromTopic([validatedResult.firebaseFCM], user.notification_topic)
+            .unsubscribeFromTopic([validatedResult.firebaseFCM], account.notification_topic)
            }
        }
-       if(validatedResult.global_option!=notification.global_option){
+       if(validatedResult.global_option!=account.global_option){
            if(validatedResult.global_option){
             await admin
             .messaging()
@@ -70,7 +86,7 @@ exports.updateCurrentNotificationSetting = async (req,res,next)=>{
            }
        }
 
-       await Notification.update({
+       await Account.update({
            personal_option:validatedResult.personal_option,
            global_option:validatedResult.global_option
        },{
