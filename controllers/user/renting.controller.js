@@ -14,7 +14,6 @@ exports.getCurrentRenting = async (req,res,next)=>{
                 where:{
                     is_active:true
                 }
-
             }]
         });
        
@@ -81,9 +80,6 @@ exports.getRentingDetail = async (req,res,next)=>{
         }
 
     
-
-
-
       
       let tranformedData = await viewRentingWithDetail(renting);
 
