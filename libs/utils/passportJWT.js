@@ -23,7 +23,7 @@ passport.use(new JwtStrategy(opts,
             return done(null, user);
         }
         else{
-            return done(err,null);
+            return done(new Error('Couldn\'t find use'),null);
         }
       
     

@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'GlobalNotification',
+    tableName:'globalnotifications'
   });
   return GlobalNotification;
 };
