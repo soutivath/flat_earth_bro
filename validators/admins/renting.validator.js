@@ -2,7 +2,7 @@ import Joi from "joi";
 import date from "date-and-time";
 export const checkInSchema = Joi.object({
   room_id: Joi.number().integer().required(),
-  start_renting:Joi.date().greater(new Date()).required(),
+  start_renting:Joi.date().required(),
   users_renting: Joi.array().items(Joi.number().integer()).required(),
   renting_pay_by: Joi.number().integer().required(),
 

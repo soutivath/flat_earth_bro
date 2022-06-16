@@ -64,7 +64,7 @@ exports.editUser = async (req, res, next) => {
       option.image = req.files[0].filename;
     }
 
-    const updatedUser = await User.update(option, {
+    await User.update(option, {
       where: {
         id: req.params.id,
       },
@@ -77,7 +77,7 @@ exports.editUser = async (req, res, next) => {
     }
     await t.commit();
     return res.status(200).json({
-      data: updatedUser,
+      data: [],
       message: "updated user successfully",
       success: true,
     });
