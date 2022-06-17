@@ -1409,7 +1409,7 @@ exports.addPeople = async (req, res, next) => {
 exports.getAllRenting = async (req, res, next) => {
   try {
     let allRentingData = await Renting.findAll({
-      plain: true,
+    //  plain: true,
       include: [Bill, Room],
     });
     // allRentingData = JSON.stringify(allRentingData);
@@ -1453,7 +1453,7 @@ exports.getRentingDetail = async (req, res, next) => {
       where: {
         id: renting_detail_id,
       },
-      include: ["trash_pay", "renting_pay"],
+      include: [Trash, "renting_pay_by","renting_operate_by",{model:Renting,include:Room}],
     });
     return res.status(200).json({
       data: rentingDetailData,
@@ -1468,6 +1468,7 @@ exports.getRentingDetail = async (req, res, next) => {
 exports.getAllRentingDetail = async (req, res, next) => {
   try {
     let option = [];
+  
     // if (req.query.isTrashPay === "true") {
     //   option.push({ is_trash_pay: paidType.PAID });
     //   //option.is_trash_pay =true;
@@ -1476,12 +1477,15 @@ exports.getAllRentingDetail = async (req, res, next) => {
     //   // option.is_trash_pay =false;
     //   option.push({ is_trash_pay: paidType.UNPAID });
     // }
+    
     if (req.query.isRentingPay === "true") {
       // option.is_renting_pay =true;
+     
       option.push({ is_renting_pay: paidType.PAID });
     }
     if (req.query.isRentingPay === "false") {
       option.push({ is_renting_pay: paidType.UNPAID });
+  
       //  option.is_renting_pay =false;
     }
 
@@ -1489,7 +1493,7 @@ exports.getAllRentingDetail = async (req, res, next) => {
       where: {
         [Op.and]: option,
       },
-      include: ["renting_pay_by", "renting_operate_by"],
+      include: ["renting_pay_by", "renting_operate_by",{model:Renting,include:Room}],
     });
     return res.status(200).json({
       data: rentingDetailData,

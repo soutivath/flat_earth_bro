@@ -77,7 +77,7 @@ exports.payBill = async (req, res, next) => {
       throw createHttpError(404, "User not found");
     }
 
-    const now  = date.format(new Date,"YYYY-MM-DD");
+    const now  = date.format(new Date(),"YYYY-MM-DD");
   
     let payment = await Payment.create({
       pay_by:validatedResult.pay_by,
@@ -129,7 +129,7 @@ exports.payBill = async (req, res, next) => {
 
 
       await PaymentDetail.create({
-        name:name.LA +" ວັນທີ "+date.format(checkBill.createdAt,"DD-MM-YYYY"),
+        name:name.LA +" ວັນທີ "+checkBill.createdAt,
         price:checkBill.price,
         type:name.EN,
         payment_id:payment.id,
@@ -262,14 +262,14 @@ exports.getAll = async (req, res, next) => {
 
     if(typeof req.query.payBy !=="undefined") {
         option.pay_by = req.query.pay_by;
-      
+
     }
     const allRentingData = await Bill.findAll({
       where: option,
       include: ["bill_pay_by","bill_operate_by", Renting],
     });
 
-   
+    return res.status(200).json({data:allRentingData});
     return res
       .status(200)
       .json({
