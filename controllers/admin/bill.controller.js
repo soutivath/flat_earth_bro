@@ -264,6 +264,15 @@ exports.getAll = async (req, res, next) => {
         option.pay_by = req.query.pay_by;
 
     }
+
+    if(typeof req.query.isPaid!=="undefined") {
+      if (
+        req.query.is_pay == paidType.PAID ||
+        req.query.is_pay == paidType.UNPAID
+      ) {
+        option.bill_type = req.query.billType;
+      }
+    }
     const allRentingData = await Bill.findAll({
       where: option,
       include: ["bill_pay_by","bill_operate_by", Renting],
@@ -289,18 +298,21 @@ exports.getByRenting = async (req, res, next) => {
       where: {
         id: renting_id,
       },
-      plain: true,
-      include: [Bill,Room],
+      //plain: true,
+      include: [{model:Bill,include:["bill_pay_by","bill_operate_by"]},Room],
     });
     allRentingData = JSON.stringify(allRentingData);
     allRentingData = JSON.parse(allRentingData);
+  
     let billTranform = bills(allRentingData.Bills);
+
+    
+
     allRentingData.Bills = billTranform;
 
     
    
-  
-
+ 
 
     return res.status(200).json({
       data:allRentingData,

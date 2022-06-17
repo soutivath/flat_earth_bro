@@ -3,6 +3,7 @@ import { sequelize, User,Account } from "../../models";
 import {
   registerUserSchema,
   loginUserSchema,
+  loginFCMUserSchema
 } from "../../validators/users/authentication.validator";
 import { hashPassword, compareHashPassword } from "../../libs/utils/bcrypt";
 import createHttpError from "http-errors";
@@ -148,7 +149,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
-    const validatedResult = await loginUserSchema.validateAsync(req.body);
+    const validatedResult = await loginFCMUserSchema.validateAsync(req.body);
     //check OTP bro -------------->
     let uid;
     let phoneNumber;
@@ -167,6 +168,7 @@ exports.login = async (req, res, next) => {
     // }
 
     //--------------------------->
+    
     const user = await User.findOne({
       where: {
         phoneNumber: validatedResult.phoneNumber,
@@ -191,6 +193,62 @@ exports.login = async (req, res, next) => {
       validatedResult.password,
       user.Account.password
     );
+
+    if(user.is_admin=="user"){
+     if(user.Account.personal_option){
+      admin
+      .messaging()
+      .subscribeToTopic([validatedResult.firebaseFCM], user.Account.notification_topic)
+      .then((response) => {
+        console.log(`${user.name} is subscribeToTopic  ${user.Account.notification_topic}`)
+        console.log("Successfully subscribed to topic:", response);
+      })
+      .catch((error) => {
+        console.log("Error subscribing to topic:", error);
+      });
+     }
+     else{
+      admin
+      .messaging()
+      .unsubscribeFromTopic([validatedResult.firebaseFCM], user.Account.notification_topic)
+      .then((response) => {
+        console.log(`${user.name} is unsubscribeToTopic  ${user.Account.notification_topic}`)
+        console.log("Successfully unsubscribed to topic:", response);
+      })
+      .catch((error) => {
+        console.log("Error unsubscribing to topic:", error);
+      });
+     }
+     
+     if(user.Account.global_option){
+      admin
+      .messaging()
+      .subscribeToTopic(
+        [validatedResult.firebaseFCM],
+        GLOBAL_TOPIC.GLOBAL_TOPIC
+      )
+      .then((response) => {
+        console.log(`${user.name} is subscribeToTopic  ${GLOBAL_TOPIC.GLOBAL_TOPIC}`)
+        console.log("Successfully subscribed to topic:", response);
+      })
+      .catch((error) => {
+        console.log("Error subscribing to topic:", error);
+      });
+     }
+     else{
+      admin
+      .messaging()
+      .unsubscribeFromTopic([validatedResult.firebaseFCM], GLOBAL_TOPIC.GLOBAL_TOPIC)
+      .then((response) => {
+        console.log(`${user.name} is unsubscribeToTopic  ${GLOBAL_TOPIC.GLOBAL_TOPIC}`)
+        console.log("Successfully unsubscribed to topic:", response);
+      })
+      .catch((error) => {
+        console.log("Error unsubscribing to topic:", error);
+      });
+     }
+
+    }
 
     if (isPasswordMatch) {
       const payload = {

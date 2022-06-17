@@ -20,7 +20,7 @@ exports.userTranformer = (data)=>{
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
             Account:{
-                id: 1,
+                id: user.Account.id,
                 phoneNumber: user.Account.phoneNumber,
                 personal_option: user.Account.personal_option,
                 global_option: user.Account.global_option,

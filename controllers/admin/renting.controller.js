@@ -1410,7 +1410,7 @@ exports.getAllRenting = async (req, res, next) => {
   try {
     let allRentingData = await Renting.findAll({
     //  plain: true,
-      include: [Bill, Room],
+      include: [Bill, {model:Room,include:Type}],
     });
     // allRentingData = JSON.stringify(allRentingData);
     // allRentingData = JSON.parse(allRentingData);
@@ -1433,7 +1433,7 @@ exports.oneRenting = async (req, res, next) => {
       where: {
         id: renting_id,
       },
-      include: [Room, RentingDetail],
+      include: [{model:Room,include:Type}, RentingDetail],
     });
     return res.status(200).json({
       data: rentingData,
@@ -1453,7 +1453,9 @@ exports.getRentingDetail = async (req, res, next) => {
       where: {
         id: renting_detail_id,
       },
-      include: [Trash, "renting_pay_by","renting_operate_by",{model:Renting,include:Room}],
+      include: [Trash, "renting_pay_by","renting_operate_by",{model:Renting,include:{
+        model:Room,include:Type
+      }}],
     });
     return res.status(200).json({
       data: rentingDetailData,
@@ -1493,7 +1495,9 @@ exports.getAllRentingDetail = async (req, res, next) => {
       where: {
         [Op.and]: option,
       },
-      include: ["renting_pay_by", "renting_operate_by",{model:Renting,include:Room}],
+      include: ["renting_pay_by", "renting_operate_by",{model:Renting,include:{
+        model:Room,include:Type
+      }}],
     });
     return res.status(200).json({
       data: rentingDetailData,
