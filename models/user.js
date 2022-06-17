@@ -1,8 +1,10 @@
 'use strict';
+require('dotenv').config();
 const { dirname } = require("path");
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -55,6 +57,11 @@ module.exports = (sequelize, DataTypes) => {
     const appDir = dirname(require.main.filename);
     let dir = `${appDir}/public/images/resources/profile_images/${this.image}`;
     return dir
+  }
+
+  User.prototype.getOnlinePath = function(){
+   let path  = `${process.env.APP_DOMAIN}/images/resources/profile_images/${this.image}`;
+    return path;
   }
   
   return User;

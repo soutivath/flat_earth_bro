@@ -28,6 +28,8 @@ import notification from "./user/notification.Route";
 
 import option from "./admin/setting.Route";
 
+import mix from "./mix";
+
 //middlewares
 
 import { Auth } from '../middlewares/auth.guard';
@@ -59,6 +61,8 @@ app.use('/user',[Auth],notification);
 
 app.use("/user",resetPassword);
 app.use("/test",testRoute);
+
+app.use("/mix",[Auth],mix);
 
 
 module.exports = app;

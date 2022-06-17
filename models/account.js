@@ -34,9 +34,19 @@ module.exports = (sequelize, DataTypes) => {
   Account.prototype.getDisplayImagePath = function(){
     
     const appDir = dirname(require.main.filename);
-    let dir = `${appDir}/public/images/resources/display_image/${this.display_image}`;
+    let dir = `${appDir}/public/images/resources/display_images/${this.display_image}`;
     return dir
   }
+
+  Account.prototype.getOnlineDisplayImage = function(){
+    let image  = `${process.env.APP_DOMAIN}/images/resources/display_images/${
+      this.display_image
+    }`;
+
+    return image;
+  }
+
+  
 
   return Account;
 };
