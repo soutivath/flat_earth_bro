@@ -1409,14 +1409,18 @@ exports.addPeople = async (req, res, next) => {
 exports.getAllRenting = async (req, res, next) => {
   try {
     let option = {};
-    if(req.params.is_active=="true"){
+    if(typeof req.query.is_active!=="undefined") {
+    if(req.query.is_active=="true"){
       option.is_active=true;
     }
-    else if(req.params.is_active="false"){
-      option.is_active=false
+    else if(req.query.is_active="false"){
+      option.is_active=false;
     }
+  }
+
+
     let allRentingData = await Renting.findAll({
-    //  plain: true,
+ 
     where:option,
       include: [Bill, {model:Room,include:Type}],
     });
