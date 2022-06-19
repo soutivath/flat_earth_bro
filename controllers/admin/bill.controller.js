@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { sequelize, Renting, Bill, User, Room,Payment,
+import { sequelize, Renting, Bill, User, Room,Payment,Type,
   PaymentDetail } from "../../models";
 import {
   addBillSchema,
