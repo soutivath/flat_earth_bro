@@ -299,7 +299,7 @@ exports.getByRenting = async (req, res, next) => {
         id: renting_id,
       },
       //plain: true,
-      include: [{model:Bill,include:["bill_pay_by","bill_operate_by"]},Room],
+      include: [{model:Bill,include:["bill_pay_by","bill_operate_by"]},{model:Room,include:Type}],
     });
     allRentingData = JSON.stringify(allRentingData);
     allRentingData = JSON.parse(allRentingData);
