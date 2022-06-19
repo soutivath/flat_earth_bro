@@ -306,7 +306,10 @@ exports.getByRenting = async (req, res, next) => {
   
     let billTranform = bills(allRentingData.Bills);
 
+    const user = await User.findOne({where: {id:allRentingData.user_id}});
     
+   allRentingData.name = user.name;
+   
 
     allRentingData.Bills = billTranform;
 
