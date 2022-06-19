@@ -6,7 +6,7 @@ import {billUpload} from "../../middlewares/multer";
 const upload = require('multer')();
 router.route("/bill").post([billUpload.array("bill_image",1)],bill.addBill);
 router.route("/bill/:id").put([billUpload.array("bill_image",1)],bill.updateBill).delete(bill.deleteBill);
-router.post("/bill/pay/:id",upload.any(), bill.payBill);
+router.post("/bill/pay",upload.any(), bill.payBill);
 
 router.get("/bill",bill.getAll);
 router.get("/bill/renting/:id",bill.getByRenting);

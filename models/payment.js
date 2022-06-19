@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.User, {foreignKey: 'pay_by',as:"payBy"});
       this.belongsTo(models.User, {foreignKey: 'operate_by',as:"operateBy"});
       this.hasMany(models.PaymentDetail,{foreignKey: 'payment_id'});
+      this.belongsTo(models.Renting,{foreignKey: 'renting_id'});
     }
   }
   Payment.init({

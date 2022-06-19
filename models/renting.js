@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Room,{foreignKey: 'room_id'});
       
       this.hasMany(models.Bill,{foreignKey: 'renting_id'});
+
+      this.hasOne(models.Payment,{foreignKey:"renting_id"});
     }
   }
   Renting.init({
