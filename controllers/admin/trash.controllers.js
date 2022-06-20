@@ -159,5 +159,49 @@ exports.payTrash = async (req, res, next) => {
   }
 };
 
+exports.getTrashDataFromRenting = async(req,res,next)=>{
+  try{
+    const query = {};
+    const queryParam = req.query.isPaid;
+    if(typeof queryParam!==undefined){
+      if(queryParam=="true"){
+        query.is_trash_pay = paidType.PAID
+      }
+      else if(queryParam =="false"){
+        query.is_trash_pay = paidType.UNPAID;
+      }
+    }
+
+  
+    const renting_id = req.params.id;
+    const rentingData = await Renting.findOne({
+      where:{
+        id:renting_id
+      },
+      include:[{model:RentingDetail,include:[{model:Trash,where:query}]}]
+    });
+    return res.status(200).json({data:rentingData,message:"Get data successfully",success:true});
+  }catch(err){
+    next(err);
+  }
+}
+
+
+exports.oneTrash = async(req,res,next)=>{
+  try{
+  
+    const trash_id = req.params.id;
+    const trash_data = await Trash.findOne({
+      where:{
+        id:trash_id
+      },
+     include:["rentingdetails","trash_pay_by","trash_operate_by"]
+    });
+    return res.status(200).json({data:trash_data,message:"Get data successfully",success:true});
+  }catch(err){
+    next(err);
+  }
+}
+
 
 
