@@ -93,6 +93,7 @@ exports.editUser = async (req, res, next) => {
 exports.addAdmin = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
+    
     let imageProfile = "default_profile.png";
 
     if (req.files[0]) {
@@ -145,7 +146,7 @@ exports.addAdmin = async (req, res, next) => {
 
 
     await t.commit();
-    return res.status(201).json({
+    return res.status(200).json({
       data: newAdmin,
       message: "Create user successfully",
       success: true,

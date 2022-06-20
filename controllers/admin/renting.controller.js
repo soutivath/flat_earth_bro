@@ -37,27 +37,16 @@ exports.checkIn = async (req, res, next) => {
   const t = await sequelize.transaction();
 
   try {
-
-
-
-    
-
     const validateResult = await checkInSchema.validateAsync(req.body);
     const now = validateResult.start_renting;
-  
     let nextDate = now;
     let totalPrice = 0;
-
     let end_renting_date = date.addDays(now, (validateResult.renting_month*30));
-   
     if (validateResult.renting_months > 0) {
       end_renting_date = date.addDays(now, (validateResult.renting_months*30) + (2*30));
     } else {
       end_renting_date = date.addDays(now, (30*2));
     }
-  
-   
-
     let room = await Room.findOne({
       where: { id: validateResult.room_id },
       include: Type,
@@ -162,8 +151,10 @@ exports.checkIn = async (req, res, next) => {
       await PaymentDetail.create(
         {
           name: payment_detail_enum.RENTING.LA +
-                "ເດືອນ " +
-                date.format(date.addDays(nextDate,-29),"M").toString(),
+                "ວັນທີ " +
+                date.format(date.addDays(nextDate,-30),"YYYY-MM-DD").toString() +" - "
+                +
+                date.format(nextDate,"YYYY-MM-DD"),
           price: roomPrice,
           type: payment_detail_enum.RENTING.EN,
           payment_id: payment.id,
@@ -193,7 +184,7 @@ exports.checkIn = async (req, res, next) => {
           {
             name:
               payment_detail_enum.TRASH.LA +
-                  "ເດືອນ " +
+                  "ວັນທີ " +
                   date.format(date.addDays(nextDate,-29),"M").toString(),
             price: trash_price,
             type: payment_detail_enum.TRASH.EN,
