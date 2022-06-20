@@ -231,3 +231,31 @@ exports.getUser = async (req, res, next) => {
     next(err);
   }
 };
+exports.oneUser = async (req, res, next) => {
+  try {
+  const id = req.params.id;
+    let userData = await User.findOne({
+      where: {id: id},
+      include:Account  
+  });
+userData = JSON.stringify(userData);
+userData = JSON.parse(userData);
+userData.image = `${process.env.APP_DOMAIN}/images/resources/profile_images/${
+  userData.image
+}`;
+
+userData.Account.display_image = `${process.env.APP_DOMAIN}/images/resources/display_images/${
+  userData.Account.display_image
+}`;
+   
+    return res
+      .status(200)
+      .json({
+        data: userData,
+        message: "get data successfully",
+        success: true,
+      });
+  } catch (err) {
+    next(err);
+  }
+};

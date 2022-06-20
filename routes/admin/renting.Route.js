@@ -1,5 +1,5 @@
 import express from "express";
-import {contractUpload} from "../../middlewares/multer";
+import {contractUpload,proofOfPaymentUpload} from "../../middlewares/multer";
 const router = express.Router();
 const upload = require('multer')();
 import renting from "../../controllers/admin/renting.controller";
@@ -19,6 +19,7 @@ router.get('/renting/detail/:id',renting.getRentingDetail);
 router.get("/renting-detail",renting.getAllRentingDetail);
 
 router.post("/add_contract/:id",(contractUpload.array("contract_image",1)),renting.addContract);
+router.post("/addProofOfPayment/:id",(proofOfPaymentUpload.array("proof_image",1)),renting.addProofOfPayment);
 
 export default router;
 

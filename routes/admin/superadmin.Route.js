@@ -11,6 +11,7 @@ router.get('/nice',(req,res,next)=>{
     return res.status(200).json({data:'nice'});
 })
 router.get("/user",superadmin.getUser);
+router.get("/user/:id",superadmin.oneUser);
 
 
 export default router;

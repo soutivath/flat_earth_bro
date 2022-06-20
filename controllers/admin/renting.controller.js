@@ -39,15 +39,19 @@ exports.checkIn = async (req, res, next) => {
   try {
     const validateResult = await checkInSchema.validateAsync(req.body);
     const now = validateResult.start_renting;
+  
     let nextDate = now;
     let totalPrice = 0;
 
-    let end_renting_date = date.addMonths(now, validateResult.months);
+    let end_renting_date = date.addDays(now, (validateResult.renting_month*30));
+   
     if (validateResult.renting_months > 0) {
-      end_renting_date = date.addMonths(now, validateResult.renting_months + 2);
+      end_renting_date = date.addDays(now, (validateResult.renting_months*30) + (2*30));
     } else {
-      end_renting_date = date.addMonths(now, 2);
+      end_renting_date = date.addDays(now, (30*2));
     }
+  
+   
 
     let room = await Room.findOne({
       where: { id: validateResult.room_id },
@@ -125,7 +129,7 @@ exports.checkIn = async (req, res, next) => {
         throw createHttpError(422, "Please provide a user id");
       }
 
-      nextDate = date.addMonths(nextDate, 1);
+      nextDate = date.addDays(nextDate, (30*1));
       let rentingID = await RentingDetail.create(
         {
           end_date: nextDate,
@@ -143,14 +147,17 @@ exports.checkIn = async (req, res, next) => {
         }
       );
 
+      /*
+
+      ;
+      */
+
+
       await PaymentDetail.create(
         {
-          name:
-            date.format(nextDate, "M") - 1 == "0"
-              ? payment_detail_enum.RENTING.LA + "ເດືອນ " + "12"
-              : payment_detail_enum.RENTING.LA +
+          name: payment_detail_enum.RENTING.LA +
                 "ເດືອນ " +
-                (date.format(nextDate, "M") - 1).toString(),
+                date.format(date.addDays(nextDate,-30),"M").toString(),
           price: roomPrice,
           type: payment_detail_enum.RENTING.EN,
           payment_id: payment.id,
@@ -179,11 +186,9 @@ exports.checkIn = async (req, res, next) => {
         await PaymentDetail.create(
           {
             name:
-              date.format(nextDate, "M") - 1 == "0"
-                ? payment_detail_enum.TRASH.LA + "ເດືອນ " + "12"
-                : payment_detail_enum.TRASH.LA +
+              payment_detail_enum.TRASH.LA +
                   "ເດືອນ " +
-                  (date.format(nextDate, "M") - 1).toString(),
+                  date.format(date.addDays(nextDate,-30),"M").toString(),
             price: trash_price,
             type: payment_detail_enum.TRASH.EN,
             payment_id: payment.id,
@@ -209,7 +214,7 @@ exports.checkIn = async (req, res, next) => {
     }
 
     if (validateResult.renting_months <= 0) {
-      nextDate = date.addMonths(nextDate, 1);
+      nextDate = date.addDays(nextDate, (30*1));
       let rentingID = await RentingDetail.create(
         {
           end_date: nextDate,
@@ -238,7 +243,7 @@ exports.checkIn = async (req, res, next) => {
         if (i == validateResult.renting_months) {
           let rentingID = await RentingDetail.create(
             {
-              end_date: date.addMonths(nextDate, i + 1),
+              end_date: date.addDays(nextDate, (i*30) + (1*30)),
               renting_id: renting.id,
               is_trash_pay: paidType.UNPAID,
               is_renting_pay: paidType.UNPAID,
@@ -260,7 +265,7 @@ exports.checkIn = async (req, res, next) => {
         } else {
           let rentingID = await RentingDetail.create(
             {
-              end_date: date.addMonths(nextDate, i + 1),
+              end_date: date.addDays(nextDate, (i*30) + (1*30)),
               renting_id: renting.id,
               is_trash_pay: paidType.PAID,
               is_renting_pay: paidType.PAID,
@@ -278,12 +283,10 @@ exports.checkIn = async (req, res, next) => {
           await PaymentDetail.create(
             {
               name:
-                date.format(date.addMonths(nextDate, i + 1), "M") - 1 == "0"
-                  ? payment_detail_enum.RENTING.LA + "ເດືອນ " + "12"
-                  : payment_detail_enum.RENTING.LA +
+               payment_detail_enum.RENTING.LA +
                     "ເດືອນ " +
                     (
-                      date.format(date.addMonths(nextDate, i + 1), "M") - 1
+                      date.format(date.addDays(nextDate, i*30), "M")
                     ).toString(),
               price: roomPrice,
               type: payment_detail_enum.RENTING.EN,
@@ -316,12 +319,10 @@ exports.checkIn = async (req, res, next) => {
             await PaymentDetail.create(
               {
                 name:
-                  date.format(date.addMonths(nextDate, i + 1), "M") - 1 == "0"
-                    ? payment_detail_enum.TRASH.LA + "ເດືອນ " + "12"
-                    : payment_detail_enum.TRASH.LA +
+                  payment_detail_enum.TRASH.LA +
                       "ເດືອນ " +
                       (
-                        date.format(date.addMonths(nextDate, i + 1), "M") - 1
+                        date.format(date.addDays(nextDate, (i*30) ), "M") 
                       ).toString(),
                 price: trash_price,
                 type: payment_detail_enum.TRASH.EN,
@@ -619,18 +620,12 @@ exports.payRent = async (req, res, next) => {
         await PaymentDetail.create(
           {
             name:
-              date.format(
-                date.parse(renting_detail.end_date, "YYYY-MM-DD"),
-                "M"
-              ) -
-                1 ==
-              "0"
-                ? payment_detail_enum.RENTING.LA + "ເດືອນ " + "12"
-                : payment_detail_enum.RENTING.LA +
+         
+                 payment_detail_enum.RENTING.LA +
                   "ເດືອນ " +
                   (
                     date.format(
-                      date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                      date.parse(date.addrenting_detail.end_date, "YYYY-MM-DD"),
                       "M"
                     ) - 1
                   ).toString(),
@@ -989,6 +984,7 @@ exports.checkOut = async (req, res, next) => {
       where: {
         id: validationResult.renting_id,
       },
+     
     });
     if (!renting) throw createHttpError.NotFound("Renting not found");
   
@@ -1012,18 +1008,18 @@ exports.checkOut = async (req, res, next) => {
     });
     const allTrashPrice = trash.value;
    
-  
+    let aToDeleteRentingDetail
     
     if (!(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[1].end_date,"YYYY-MM-DD")).toDays() > 0)) {
     
-    
+ 
       let aToDeleteTrash = await Trash.findOne({
         where: {
           id: twoLastedRecord[0].Trash.id,
         },
       });
     
-      let aToDeleteRentingDetail = await RentingDetail.findOne({
+       aToDeleteRentingDetail = await RentingDetail.findOne({
         where: {
           id: twoLastedRecord[0].id,
         },
@@ -1034,7 +1030,7 @@ exports.checkOut = async (req, res, next) => {
         aToDeleteTrash.is_renting_pay != paidType.PAID &&
         aToDeleteRentingDetail.Trash.is_trash_pay != paidType.PAID
       ) {
-       
+      
         await aToDeleteTrash.destroy({
           transaction: t,
         });
@@ -1056,6 +1052,11 @@ exports.checkOut = async (req, res, next) => {
         isLastRentingGotDelete = true;
       }
     }
+    else if(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[0].end_date,"YYYY-MM-DD")).toDays() >30){
+      throw createHttpError(400,"Please pay renting before checking out");
+    }
+   
+    
   
  
   
@@ -1066,10 +1067,9 @@ exports.checkOut = async (req, res, next) => {
             renting_id: renting.id,
           },
           include: Trash,
+          
         },
-        {
-          transaction: t,
-        }
+       
       );
 
       if (
@@ -1109,19 +1109,40 @@ exports.checkOut = async (req, res, next) => {
     }
     else{
   //ຈ່າຍໂຕລ້າສຸດ ພ້ອມ ອອກບິນ
-  
+  let unpaidAllRentingDetails;
 
-  let unpaidAllRentingDetails = await RentingDetail.findAll(
-    {
-      where: {
-        renting_id: renting.id,
+  if(isLastRentingGotDelete){
+    unpaidAllRentingDetails = await RentingDetail.findAll(
+      {
+        where: {
+          renting_id: renting.id,
+          id: {
+            [Op.ne]: aToDeleteRentingDetail.id
+          }
+        },
+        include:Trash
       },
-      include:Trash
-    },
-    {
-      transaction: t,
-    }
-  );
+      {
+        transaction: t,
+      }
+    );
+  }
+  else{
+    unpaidAllRentingDetails = await RentingDetail.findAll(
+      {
+        where: {
+          renting_id: renting.id,
+        },
+        include:Trash
+      },
+      {
+        transaction: t,
+      }
+    );
+  }
+
+  
+ 
 
   let checkId = null;
   
@@ -1548,3 +1569,35 @@ exports.addContract = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.addProofOfPayment = async (req,res,next)=>{
+  try{
+    const image = req.files[0];
+    const payment_id = req.params.id;
+    const t = await sequelize.transaction();
+    try {
+      if (!image) {
+        throw createHttpError(400, "Image not found");
+      }
+      let checkPayment = await Payment.findByPk(payment_id);
+      if (!checkPayment) {
+        throw createHttpError(400, "Renting not found");
+      }
+      checkPayment.proof_of_payment = image.filename;
+      await checkPayment.save({transaction:t});
+  
+      await t.commit();
+  
+      return res.status(200).json({
+        data: checkPayment,
+        message: "Add contract successfully",
+        success: true,
+      });
+    } catch (err) {
+      await t.rollback();
+      next(err);
+    }
+  }catch(err){
+    next(err);
+  }
+}

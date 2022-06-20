@@ -12,6 +12,7 @@ router.post("/logout",upload.any(),user.logout);
 
 router.get("/user",user.getUser);
 
+
 router.get("/setting",setting.getOption);
 router.get("/setting/:id",setting.showOption);
 

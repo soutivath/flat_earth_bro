@@ -105,6 +105,18 @@ const billStorage = multer.diskStorage({
   },
   filename: fileName,
 });
+const proofOfPayment = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let dir = `${appDir}/public/images/resources/pop/`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+      req.files[0].fullFolderName = dir;
+    }
+
+    cb(null, dir);
+  },
+  filename: fileName,
+});
 const contractStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     let dir = `${appDir}/public/images/resources/contract/`;
@@ -173,5 +185,9 @@ export const contractUpload = multer({
 });
 export const displayImageUpload = multer({
   storage: displayProfileStorage,
+  fileFilter: fileFilter,
+});
+export const proofOfPaymentUpload = multer({
+  storage: proofOfPayment,
   fileFilter: fileFilter,
 });

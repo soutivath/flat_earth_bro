@@ -58,8 +58,8 @@ exports.login = async (req, res, next) => {
   try {
     const validatedResult = await loginUserSchema.validateAsync(req.body);
     //check OTP bro -------------->
-    let uid;
-    let phoneNumber;
+    // let uid;
+    // let phoneNumber;
     // firebase
     //   .getAuth()
     //   .verifyIdToken(validatedResult.firebaseFCM)

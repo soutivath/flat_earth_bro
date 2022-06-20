@@ -3,7 +3,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('settings', [{
-      name:"deposite",
+      name:"deposit",
       value:30000,
       createdAt: new Date(),
       updatedAt: new Date()
