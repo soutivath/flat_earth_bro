@@ -185,7 +185,8 @@ exports.checkIn = async (req, res, next) => {
             name:
               payment_detail_enum.TRASH.LA +
                   "ວັນທີ " +
-                  date.format(date.addDays(nextDate,-29),"M").toString(),
+                  date.format(date.addDays(nextDate,-30),"YYYY-MM-DD").toString()+" - "+
+                  date.format(nextDate,"YYYY-MM-DD").toString(),
             price: trash_price,
             type: payment_detail_enum.TRASH.EN,
             payment_id: payment.id,
@@ -283,9 +284,11 @@ exports.checkIn = async (req, res, next) => {
             {
               name:
                payment_detail_enum.RENTING.LA +
-                    "ເດືອນ " +
+                    "ວັນທີ " +
                     (
-                      date.format(date.addDays(nextDate, i*30), "M")
+                      date.format(date.addDays(nextDate, (i==0?0:(i-1))*30), "YYYY-MM-DD")
+                    ).toString()+" - "+(
+                      date.format(date.addDays(nextDate, i*30), "YYYY-MM-DD")
                     ).toString(),
               price: roomPrice,
               type: payment_detail_enum.RENTING.EN,
@@ -319,9 +322,11 @@ exports.checkIn = async (req, res, next) => {
               {
                 name:
                   payment_detail_enum.TRASH.LA +
-                      "ເດືອນ " +
+                      "ວັນທີ " +
                       (
-                        date.format(date.addDays(nextDate, (i*30) ), "M") 
+                        date.format(date.addDays(nextDate, ((i==0?0:(i-1))*30) ), "YYYY-MM-DD") 
+                      ).toString()+" - "+(
+                        date.format(date.addDays(nextDate, (i*30) ), "YYYY-MM-DD") 
                       ).toString(),
                 price: trash_price,
                 type: payment_detail_enum.TRASH.EN,

@@ -31,7 +31,7 @@ exports.editUser = async (req, res, next) => {
       where: {
         phoneNumber: validatedResult.phoneNumber,
         id:{
-          [Op.ne]:req.user.id
+          [Op.ne]:user.phoneNumber
         }
       },
     });
