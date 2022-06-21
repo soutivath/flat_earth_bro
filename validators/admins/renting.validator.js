@@ -36,10 +36,10 @@ export const payRentSchema = Joi.object({
 export const checkOutSchema = Joi.object({
   renting_id: Joi.number().integer().required(),
   bypass_checkout: Joi.boolean().required(),
-  renting_pay_by:Joi.number().integer(),
-  pay_last_renting:Joi.boolean(),
-  amount:Joi.number().integer(),
-  fine:Joi.number().integer(),
+ // renting_pay_by:Joi.number().integer(),
+  //pay_last_renting:Joi.boolean(),
+ // amount:Joi.number().integer(),
+ // fine:Joi.number().integer(),
 
   
 });

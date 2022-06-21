@@ -10,7 +10,8 @@ exports.getCurrentNotification = async (req,res,next) => {
         const notificationData = await Notification.findOne({
             where:{
                 id:req.user.id
-            }
+            },
+            include:"users"
         });
 
         await Notification.update({
