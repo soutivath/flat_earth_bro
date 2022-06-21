@@ -144,7 +144,9 @@ exports.sendGlobalNotification = async (req, res, next) => {
 
 exports.getAllNotification = async (req,res,next)=>{
   try{
-    const allNotification = await Notification.findAll();
+    const allNotification = await Notification.findAll({
+      include:"users"
+    });
     return res.status(200).json({
       data:allNotification,
       message:"get data successfully",
@@ -161,7 +163,8 @@ exports.showNotification = async (req,res,next)=>{
     const notifiation = await Notification.findAll({
       where:{
         id:id
-      }
+      },
+      include:"users"
     });
     return res.status(200).json({
       data:notifiation,
