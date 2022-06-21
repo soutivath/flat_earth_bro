@@ -1055,9 +1055,12 @@ exports.checkOut = async (req, res, next) => {
         include:[Trash]
       });
 
-      if(aToDeleteRentingDetail.Trash.is_trash_pay!=paidType.PAID && aToDeleteRentingDetail.is_renting_pay==paidType.PAID){
-       
+      if(aToDeleteRentingDetail.Trash.is_trash_pay==paidType.PAID && aToDeleteRentingDetail.is_renting_pay==paidType.PAID){
+       aToDeleteTrash.is_trash_pay = paidType.PASS;
+
+       await aToDeleteTrash.save({transaction:t});
       }
+      
       
       if (
         aToDeleteTrash.is_renting_pay != paidType.PAID 

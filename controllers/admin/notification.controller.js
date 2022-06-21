@@ -160,7 +160,7 @@ exports.getAllNotification = async (req,res,next)=>{
 exports.showNotification = async (req,res,next)=>{
   try{
     const id = req.params.id;
-    const notifiation = await Notification.findAll({
+    const notifiation = await Notification.findOne({
       where:{
         id:id
       },
