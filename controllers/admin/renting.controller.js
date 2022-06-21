@@ -1037,10 +1037,12 @@ exports.checkOut = async (req, res, next) => {
     let aToDeleteRentingDetail
 
    
-     if(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[0].end_date,"YYYY-MM-DD")).toDays() >30){
+     if(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[0].end_date,"YYYY-MM-DD")).toDays() >30 && validationResult.validatebypass_checkout == true){
       throw createHttpError(400,"Please pay renting before checking out");
     }
+    
     if (!(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[1].end_date,"YYYY-MM-DD")).toDays() > 0)) {
+
       let aToDeleteTrash = await Trash.findOne({
         where: {
           id: twoLastedRecord[0].Trash.id,
@@ -1052,6 +1054,11 @@ exports.checkOut = async (req, res, next) => {
         },
         include:[Trash]
       });
+
+      if(aToDeleteRentingDetail.Trash.is_trash_pay!=paidType.PAID && aToDeleteRentingDetail.is_renting_pay==paidType.PAID){
+       
+      }
+      
       if (
         aToDeleteTrash.is_renting_pay != paidType.PAID 
         //&& aToDeleteRentingDetail.Trash.is_trash_pay != paidType.PAID
@@ -1075,6 +1082,10 @@ exports.checkOut = async (req, res, next) => {
         );
         isLastRentingGotDelete = true;
       }
+
+
+
+
     }
     if (validationResult.validatebypass_checkout == true) {
       let rentingDetailData = await RentingDetail.findAll(
@@ -1172,7 +1183,6 @@ exports.checkOut = async (req, res, next) => {
   }
 
   
- 
   for (let eachUnpaid of unpaidAllRentingDetails) {
     // if (eachUnpaid.id != checkId) {
       

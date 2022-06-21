@@ -248,7 +248,7 @@ exports.deleteGlobalNotification = async (req,res,next)=>{
 exports.showGlobalNotification = async (req,res,next)=>{
   try{
     const id = req.params.id;
-    const notifiation = await GlobalNotification.findAll({
+    const notifiation = await GlobalNotification.findOne({
       where:{
         id:id
       }
