@@ -20,10 +20,11 @@ const path = require("path");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 exports.addBill = async (req, res, next) => {
-  const image = req.files[0];
+ 
 
   const t = await sequelize.transaction();
   try {
+    const image = req.files[0];
     if (!image) {
       throw createHttpError(400, "Image not found");
     }

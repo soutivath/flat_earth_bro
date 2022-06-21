@@ -127,6 +127,7 @@ exports.checkIn = async (req, res, next) => {
     
       let rentingID = await RentingDetail.create(
         {
+          start_date:date.format(date.addDays(nextDate,-30),"YYYY-MM-DD"),
           end_date: nextDate,
           renting_id: renting.id,
           is_renting_pay: paidType.PAID,
@@ -216,6 +217,7 @@ exports.checkIn = async (req, res, next) => {
     
       let rentingID = await RentingDetail.create(
         {
+          start_date:date.format(date.addDays(nextDate,-30),"YYYY-MM-DD"),
           end_date: nextDate,
           renting_id: renting.id,
           is_trash_pay: paidType.UNPAID,
@@ -243,6 +245,7 @@ exports.checkIn = async (req, res, next) => {
         if (i == validateResult.renting_months) {
           let rentingID = await RentingDetail.create(
             {
+              start_date:date.format(date.addDays(nextDate,(i*30)),'YYYY-MM-DD'),
               end_date: date.addDays(nextDate, (i*30) + (1*30)),
               renting_id: renting.id,
               is_trash_pay: paidType.UNPAID,
@@ -265,6 +268,7 @@ exports.checkIn = async (req, res, next) => {
         } else {
           let rentingID = await RentingDetail.create(
             {
+              start_date:date.format(date.addDays(nextDate,(i*30)),"YYYY-MM-DD"),
               end_date: date.addDays(nextDate, (i*30) + (1*30)),
               renting_id: renting.id,
               is_trash_pay: paidType.PAID,
@@ -630,13 +634,16 @@ exports.payRent = async (req, res, next) => {
           {
             name:
                  payment_detail_enum.RENTING.LA +
-                  "ເດືອນ " +
+                  "ວັນທີ " +
                   (
                     date.format(
-                     date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-20),
-                      "M"
+                     date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-30),
+                      "YYYY-MM-DD"
                     )
-                  ).toString(),
+                  ).toString()+" - "+( date.format(
+                   date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                     "YYYY-MM-DD"
+                   )),
             price: roomPrice,
             type: payment_detail_enum.RENTING.EN,
             payment_id: payment.id,
@@ -670,13 +677,18 @@ exports.payRent = async (req, res, next) => {
           {
             name:
              payment_detail_enum.TRASH.LA +
-                  "ເດືອນ " +
+                  "ວັນທີ " +
                   (
                    date.format(
-                      date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-28),
+                      date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-30),
                       "M"
                     )
-                  ).toString(),
+                  ).toString()+" - "+ (
+                    date.format(
+                      date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                       "YYYY-MM-DD"
+                     )
+                   ).toString(),
             price: allTrashPrice,
             type: payment_detail_enum.TRASH.EN,
             payment_id: payment.id,
@@ -696,11 +708,16 @@ exports.payRent = async (req, res, next) => {
           {
             name:
               payment_detail_enum.FINE.LA +
-                  "ເດືອນ " +
+                  "ວັນທີ " +
                   (
                     date.format(
-                      date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-28),
+                      date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-30),
                       "M"
+                    )
+                  ).toString()+" - "+ (
+                    date.format(
+                      date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                      "YYYY-MM-DD"
                     )
                   ).toString(),
             price: eachRenitngDetail.fine,
@@ -730,6 +747,9 @@ exports.payRent = async (req, res, next) => {
         let newRentingId = await RentingDetail.create(
           {
             renting_id: checkRenting.id,
+            start_date:
+              date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+            
             end_date: date.addDays(
               date.parse(renting_detail.end_date, "YYYY-MM-DD"),
               (1*30)
@@ -785,6 +805,10 @@ exports.payRent = async (req, res, next) => {
           let emptyRenting = await RentingDetail.create(
             {
               renting_id: checkRenting.id,
+              start_date:date.addDays(
+                date.parse(checkRenting.end_renting_date, "YYYY-MM-DD"),
+                (i*30)
+              ),
               end_date: date.addDays(
                 date.parse(checkRenting.end_renting_date, "YYYY-MM-DD"),
                 (i*30) + (1*30)
@@ -814,6 +838,7 @@ exports.payRent = async (req, res, next) => {
 
           let newPaidRentingDetail = await RentingDetail.create(
             {
+              start_date:date.addDays(aEndDate,-30),
               renting_id: checkRenting.id,
               end_date: aEndDate,
               is_renting_pay: paidType.PAID,
@@ -832,8 +857,8 @@ exports.payRent = async (req, res, next) => {
             {
               name:
                payment_detail_enum.RENTING.LA +
-                    "ເດືອນ " +
-                    (date.format(date.addDays(aEndDate,-28), "M")).toString(),
+                    "ວັນທີ " +
+                    (date.format(date.addDays(aEndDate,-30), "M")).toString()+" - "+(date.format(aEndDate)).toString(),
               price: roomPrice,
               type: payment_detail.RENTING.EN,
               payment_id: payment.id,
@@ -867,8 +892,8 @@ exports.payRent = async (req, res, next) => {
               {
                 name:
                   payment_detail_enum.TRASH.LA +
-                      "ເດືອນ " +
-                      (date.format(date.addDays(aEndDate,-28), "M")).toString(),
+                      "ວັນທີ " +
+                      (date.format(date.addDays(aEndDate,-30), "M")).toString()+" - "+(date.format(aEndDate,"YYYY-MM-DD")).toString(),
                 price: allTrashPrice,
                 type: payment_detail.TRASH.EN,
                 payment_id: payment.id,
@@ -1237,11 +1262,9 @@ exports.checkOut = async (req, res, next) => {
         
 
           await PaymentDetail.create({
-            name: date.format(date.parse(eachUnpaid.end_date, "YYYY-MM-DD"), "M") - 1 == "0"
-            ? payment_detail_enum.CHECKOUT.LA + "ເດືອນ " + "12"
-            : payment_detail_enum.CHECKOUT.LA +
-              "ເດືອນ " +
-              (date.format(date.parse(eachUnpaid.end_date, "YYYY-MM-DD"), "M") - 1).toString(),
+            name:  payment_detail_enum.CHECKOUT.LA +
+              "ວັນທີ " +
+              date.format(date.addDays(date.parse(eachUnpaid.end_date, "YYYY-MM-DD"), -30), "YYYY-MM-DD").toString()+" - "+date.format(date.parse(eachUnpaid.end_date, "YYYY-MM-DD"), "YYYY-MM-DD").toString(),
             price: validationResult.amount,
             type: payment_detail_enum.CHECKOUT.EN,
             payment_id: checkout_payment.id,
@@ -1271,11 +1294,9 @@ exports.checkOut = async (req, res, next) => {
         }
 
         await PaymentDetail.create({
-          name: date.format(date.parse(eachUnpaid.end_date,"YYYY=MM-DD"), "M") - 1 == "0"
-          ? payment_detail_enum.TRASH.LA + "ເດືອນ " + "12"
-          : payment_detail_enum.TRASH.LA +
-            "ເດືອນ " +
-            (date.format(date.parse(eachUnpaid.end_date,"YYYY-MM-DD"), "M") - 1).toString(),
+          name:  payment_detail_enum.TRASH.LA +
+            "ວັນທີ " +
+            date.format(date.addDays(date.parse(eachUnpaid.end_date,"YYYY-MM-DD"), -30), "YYYY-MM-DD").toString()+" - "+date.format(date.parse(eachUnpaid.end_date,"YYYY-MM-DD"),"YYYY-MM-DD").toString(),
           price: allTrashPrice,
           type: payment_detail_enum.TRASH.EN,
           payment_id: checkout_payment.id,

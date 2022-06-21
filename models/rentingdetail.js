@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   
   RentingDetail.init({
     renting_id:DataTypes.INTEGER,
+    start_date:DataTypes.DATEONLY,
     end_date:DataTypes.DATEONLY,
    
     is_renting_pay:DataTypes.ENUM("paid","unpaid","pass"),
