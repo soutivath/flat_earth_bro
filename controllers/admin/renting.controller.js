@@ -681,7 +681,7 @@ exports.payRent = async (req, res, next) => {
                   (
                    date.format(
                       date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-30),
-                      "M"
+                      "YYYY-MM-DD"
                     )
                   ).toString()+" - "+ (
                     date.format(
@@ -712,7 +712,7 @@ exports.payRent = async (req, res, next) => {
                   (
                     date.format(
                       date.addDays(date.parse(renting_detail.end_date, "YYYY-MM-DD"),-30),
-                      "M"
+                      "YYYY-MM-DD"
                     )
                   ).toString()+" - "+ (
                     date.format(
@@ -791,6 +791,7 @@ exports.payRent = async (req, res, next) => {
     }
    
     if (months != 0) {
+    
       if (checkRenting.active == 0) {
         throw createHttpError(400, "this renting is already checkout");
       }
@@ -835,7 +836,7 @@ exports.payRent = async (req, res, next) => {
             date.parse(checkRenting.end_renting_date, "YYYY-MM-DD"),
           (i*30) + (1*30)
           );
-
+         
           let newPaidRentingDetail = await RentingDetail.create(
             {
               start_date:date.addDays(aEndDate,-30),
@@ -853,12 +854,15 @@ exports.payRent = async (req, res, next) => {
             }
           );
 
+        
+
+
           await PaymentDetail.create(
             {
               name:
                payment_detail_enum.RENTING.LA +
                     "ວັນທີ " +
-                    (date.format(date.addDays(aEndDate,-30), "M")).toString()+" - "+(date.format(aEndDate)).toString(),
+                    (date.format(date.addDays(aEndDate,-30), "YYYY-MM-DD")).toString()+" - "+(date.format(aEndDate,"YYYY-MM-DD")).toString(),
               price: roomPrice,
               type: payment_detail.RENTING.EN,
               payment_id: payment.id,
@@ -867,6 +871,7 @@ exports.payRent = async (req, res, next) => {
               transaction: t,
             }
           );
+       
 
           totalPrice += parseInt(roomPrice);
 
@@ -893,7 +898,7 @@ exports.payRent = async (req, res, next) => {
                 name:
                   payment_detail_enum.TRASH.LA +
                       "ວັນທີ " +
-                      (date.format(date.addDays(aEndDate,-30), "M")).toString()+" - "+(date.format(aEndDate,"YYYY-MM-DD")).toString(),
+                      (date.format(date.addDays(aEndDate,-30), "YYYY-MM-DD")).toString()+" - "+(date.format(aEndDate,"YYYY-MM-DD")).toString(),
                 price: allTrashPrice,
                 type: payment_detail.TRASH.EN,
                 payment_id: payment.id,
@@ -916,6 +921,7 @@ exports.payRent = async (req, res, next) => {
           }
         }
       }
+    
 
       await Renting.update(
         {
