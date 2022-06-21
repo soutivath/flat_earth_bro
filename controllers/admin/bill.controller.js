@@ -20,11 +20,12 @@ const path = require("path");
 const { dirname } = require("path");
 const appDir = dirname(require.main.filename);
 exports.addBill = async (req, res, next) => {
- 
-
   const t = await sequelize.transaction();
   try {
-    const image = req.files[0];
+    const image = req?.files[0];
+    if(image===undefined){
+      throw createHttpError(400,"Please provide an image");
+    }
     if (!image) {
       throw createHttpError(400, "Image not found");
     }
@@ -54,6 +55,7 @@ exports.addBill = async (req, res, next) => {
   } catch (err) {
     await t.rollback();
     try {
+      console.log("deleting a bill image");
       fs.unlinkSync(image.path);
     } catch (err) {
       console.log(err);
