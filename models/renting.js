@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.User,{foreignKey: 'user_id',through: "userrentings",as:"users"});
+      this.belongsToMany(models.User,{foreignKey: 'renting_id',through: "userrentings",as:"users"});
 
       this.hasMany(models.RentingDetail,{foreignKey: 'renting_id'});
       this.belongsTo(models.Room,{foreignKey: 'room_id'});
@@ -19,6 +19,8 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Bill,{foreignKey: 'renting_id'});
 
       this.hasOne(models.Payment,{foreignKey:"renting_id"});
+
+    //  this.hasMany(models.UserRenting,{foreignKey:"renting_id",as:"nice"});
     }
   }
   Renting.init({

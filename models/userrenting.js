@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.User,{foreignKey:"user_id",onDelete:"CASCADE"});
-      this.belongsTo(models.Renting,{foreignKey:"renting_id",onDelete:"CASCADE"})
+      // this.belongsTo(models.User,{foreignKey:"user_id",onDelete:"CASCADE"});
+      // this.belongsTo(models.Renting,{foreignKey:"renting_id",onDelete:"CASCADE"})
     }
   }
   UserRenting.init({

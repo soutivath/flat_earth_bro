@@ -1039,6 +1039,16 @@ exports.checkOut = async (req, res, next) => {
     const allTrashPrice = trash.value;
    
     let aToDeleteRentingDetail
+
+   
+
+    
+
+     if(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[0].end_date,"YYYY-MM-DD")).toDays() >30){
+      throw createHttpError(400,"Please pay renting before checking out");
+    }
+
+    
     
     if (!(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[1].end_date,"YYYY-MM-DD")).toDays() > 0)) {
     
@@ -1082,9 +1092,7 @@ exports.checkOut = async (req, res, next) => {
         isLastRentingGotDelete = true;
       }
     }
-    else if(date.subtract(date.parse(nowDate,"YYYY-MM-DD"), date.parse(twoLastedRecord[0].end_date,"YYYY-MM-DD")).toDays() >30){
-      throw createHttpError(400,"Please pay renting before checking out");
-    }
+   
    
     
   
@@ -1245,6 +1253,8 @@ exports.checkOut = async (req, res, next) => {
               end_date: nowDate,
               renting_pay_amount: checkOutSchema.amount,
               proof_of_payment: checkout_no,
+              pay_by:validationResult.renting_pay_by,
+              operate_by:req.user.id
             },
             {
               where: {
@@ -1492,7 +1502,12 @@ exports.oneRenting = async (req, res, next) => {
       where: {
         id: renting_id,
       },
-      include: [{model:Room,include:Type}, {model:RentingDetail,include:Trash}],
+      include: [
+        //{model:Room,include:Type}, {model:RentingDetail,include:Trash},
+        {
+        model:User,
+        as:"users",
+      }],
     });
     return res.status(200).json({
       data: rentingData,
