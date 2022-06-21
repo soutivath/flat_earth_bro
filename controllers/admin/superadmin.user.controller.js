@@ -23,8 +23,8 @@ exports.editUser = async (req, res, next) => {
       throw createHttpError(404, "User not found");
     }
 
-    if(user.is_admin=="superadmin"&&req.user.is_admin!="superadmin"){
-      throw createHttpError(403,"You don't have permission to edit this user");
+    if(req.user.is_admin=="admin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin=="admin")){
+      throw createHttpError(403, "permission denied");
     }
 
     const checkUser = await User.findOne({
@@ -109,7 +109,10 @@ exports.addAdmin = async (req, res, next) => {
       throw createHttpError(400, "Phone number already exists");
     }
 
-    if(req.user.is_admin!="superadmin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin== "admin")){
+    // ຖ້າ uuser role != superadmin 
+    // if role a
+
+    if(req.user.is_admin=="admin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin=="admin")){
       throw createHttpError(403, "permission denied");
     }
 
@@ -170,11 +173,9 @@ exports.deleteUser = async (req, res, next) => {
     }
     const user = await User.findByPk(userId);
 
-    if(req.user.is_admin!="superadmin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin== "admin")){
-    
+    if(req.user.is_admin=="admin"&&(validatedResult.is_admin=="superadmin"||validatedResult.is_admin=="admin")){
       throw createHttpError(403, "permission denied");
     }
-
 
     const userImagePath = user.getProfilePath();
 
