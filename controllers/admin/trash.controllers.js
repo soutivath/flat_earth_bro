@@ -112,11 +112,9 @@ exports.payTrash = async (req, res, next) => {
 
     
     await PaymentDetail.create({
-      name:  (date.format(date.parse(trash_detail.rentingdetails.end_date,"YYYY-MM-DD"), "M") - 1) ==
-      "0"
-      ? payment_detail_enum.TRASH.LA + "ເດືອນ " + "12": payment_detail_enum.TRASH.LA +
-      "ເດືອນ " +
-      (date.format(date.parse(trash_detail.rentingdetails.end_date, "YYYY-MM-DD"), "M") - 1).toString(),
+      name: payment_detail_enum.TRASH.LA +
+      "ວັນທີ " +(date.format(date.addDays(date.parse(trash_detail.rentingdetails.end_date, "YYYY-MM-DD"),-30), "YYYY-MM-DD")).toString()+" - "+
+      date.format(date.parse(trash_detail.rentingdetails.end_date, "YYYY-MM-DD"),"YYYY-MM-DD").toString(),
       price:trash_price.value,
       type:payment_detail_enum.TRASH.EN,
       payment_id:payment.id
@@ -178,7 +176,7 @@ exports.getTrashDataFromRenting = async(req,res,next)=>{
       where:{
         id:renting_id
       },
-      include:[{model:RentingDetail,include:[{model:Trash,where:query}]}]
+      include:[Room,{model:RentingDetail,include:[{model:Trash,where:query}]}]
     });
     return res.status(200).json({data:rentingData,message:"Get data successfully",success:true});
   }catch(err){

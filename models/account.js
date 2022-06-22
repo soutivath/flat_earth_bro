@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     display_name:DataTypes.STRING,
     user_id: DataTypes.INTEGER,
     display_image:DataTypes.STRING,
+    fcm:DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Account',
