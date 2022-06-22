@@ -99,7 +99,7 @@ exports.payTrash = async (req, res, next) => {
         trash_pay_amount: trash_price.value,
         pay_by:validationResult.pay_by,
         operate_by:req.user.id,
-        proof_of_payment:payment_no
+        proof_of_payment:payment.id
       },
       {
         where: {

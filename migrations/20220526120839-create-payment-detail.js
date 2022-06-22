@@ -15,7 +15,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       type: {
-        type: Sequelize.ENUM("water","electric","trash","renting","fine")
+        type: Sequelize.ENUM("water","electric","trash","renting","fine","checkout")
       
       },
       payment_id:{

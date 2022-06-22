@@ -39,7 +39,7 @@ export const checkOutSchema = Joi.object({
   renting_pay_by:Joi.number().integer(),
   pay_last_renting:Joi.boolean(),
   amount:Joi.number().integer(),
-  trash:Joi.number().integer()
+  trash_amount:Joi.number().integer()
 // fine:Joi.number().integer(),
 
   

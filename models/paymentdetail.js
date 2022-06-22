@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   PaymentDetail.init({
     name: DataTypes.STRING,
     price: DataTypes.INTEGER,
-    type: DataTypes.ENUM("water","electric","trash","renting","fine"),
+    type: DataTypes.ENUM("water","electric","trash","renting","fine","checkout"),
     payment_id:DataTypes.INTEGER
   }, {
     sequelize,
