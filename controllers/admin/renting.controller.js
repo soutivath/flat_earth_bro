@@ -1030,6 +1030,7 @@ exports.checkOut = async (req, res, next) => {
     let isLastRentingGotDelete = false;
     let checkout_payment = null;
     let checkout_no = "";
+    let total = 0;
     const renting = await Renting.findOne({
       where: {
         id: validationResult.renting_id,
@@ -1233,11 +1234,14 @@ exports.checkOut = async (req, res, next) => {
                   pay_by: validationResult.renting_pay_by,
                   renting_id: renting.id,
                   operate_by: req.user.id,
+                  pay_date:new Date(),
                 },
                 {
                   transaction: t,
                 }
               );
+
+              
 
               checkout_no = checkout_payment.id.toString().padStart(10, "0");
               await RentingDetail.update(
@@ -1256,6 +1260,8 @@ exports.checkOut = async (req, res, next) => {
                   transaction: t,
                 }
               );
+
+              total+= parseInt(validationResult.amount);
 
               await Renting.update(
                 {
@@ -1300,6 +1306,7 @@ exports.checkOut = async (req, res, next) => {
           }
           ////////////////////////////////////////////////////////////////
 
+          
           if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
             if (checkout_payment == null) {
               checkout_payment = await Payment.create(
@@ -1307,6 +1314,7 @@ exports.checkOut = async (req, res, next) => {
                   pay_by: validationResult.renting_pay_by,
                   renting_id: renting.id,
                   operate_by: req.user.id,
+                  pay_date:new Date(),
                 },
                 {
                   transaction: t,
@@ -1317,18 +1325,20 @@ exports.checkOut = async (req, res, next) => {
               await Trash.update(
                 {
                   is_trash_pay: paidType.PAID,
-                  trash_pay_amount: validationResult.amount,
+                  trash_pay_amount: validationResult.trash_amount,
                   proof_of_payment: checkout_payment.id,
                   pay_by: validationResult.renting_pay_by,
                   operate_by: req.user.id,
                 },
                 {
                   where: {
-                    id: checkId,
+                    rentingdetails_id: checkId,
                   },
                   transaction: t,
                 }
               );
+
+              total+= parseInt(validationResult.trash_amount);
 
               await Renting.update(
                 {
@@ -1379,6 +1389,7 @@ exports.checkOut = async (req, res, next) => {
 
     if (checkout_payment != null) {
       checkout_payment.payment_no = checkout_no;
+      checkout_payment.total =total;
       await checkout_payment.save({ transaction: t });
     }
 
