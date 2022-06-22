@@ -15,5 +15,5 @@ export const loginUserSchema = Joi.object({
 export const loginFCMUserSchema = Joi.object({
     "phoneNumber":Joi.number().integer().required(),
     "password":Joi.string().required(),
-    "firebaseFCM":Joi.string().required()
+   
 });

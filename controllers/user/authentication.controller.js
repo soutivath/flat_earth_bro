@@ -79,7 +79,8 @@ exports.register = async (req, res, next) => {
         uid: uid,
         display_name: validatedResult.display_name,
         global_option:1,
-        personal_option:1
+        personal_option:1,
+        fcm:validatedResult.firebaseFCM
       },
       {
         where: {
@@ -198,7 +199,7 @@ exports.login = async (req, res, next) => {
      if(user.Account.personal_option){
       admin
       .messaging()
-      .subscribeToTopic([validatedResult.firebaseFCM], user.Account.notification_topic)
+      .subscribeToTopic([user.Account.fcm], user.Account.notification_topic)
       .then((response) => {
         console.log(`${user.name} is subscribeToTopic  ${user.Account.notification_topic}`)
         console.log("Successfully subscribed to topic:", response);
@@ -210,7 +211,7 @@ exports.login = async (req, res, next) => {
      else{
       admin
       .messaging()
-      .unsubscribeFromTopic([validatedResult.firebaseFCM], user.Account.notification_topic)
+      .unsubscribeFromTopic([user.Account.fcm], user.Account.notification_topic)
       .then((response) => {
         console.log(`${user.name} is unsubscribeToTopic  ${user.Account.notification_topic}`)
         console.log("Successfully unsubscribed to topic:", response);
@@ -224,7 +225,7 @@ exports.login = async (req, res, next) => {
       admin
       .messaging()
       .subscribeToTopic(
-        [validatedResult.firebaseFCM],
+        [user.Account.fcm],
         GLOBAL_TOPIC.GLOBAL_TOPIC
       )
       .then((response) => {
@@ -238,7 +239,7 @@ exports.login = async (req, res, next) => {
      else{
       admin
       .messaging()
-      .unsubscribeFromTopic([validatedResult.firebaseFCM], GLOBAL_TOPIC.GLOBAL_TOPIC)
+      .unsubscribeFromTopic([user.Account.fcm], GLOBAL_TOPIC.GLOBAL_TOPIC)
       .then((response) => {
         console.log(`${user.name} is unsubscribeToTopic  ${GLOBAL_TOPIC.GLOBAL_TOPIC}`)
         console.log("Successfully unsubscribed to topic:", response);
