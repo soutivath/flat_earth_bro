@@ -615,6 +615,7 @@ exports.payRent = async (req, res, next) => {
       }
 
       if (
+        typeof eachRenitngDetail.trash_pay !== "undefined" &&
         eachRenitngDetail.trash_pay == true &&
         renting_detail.Trash.is_trash_pay == paidType.PAID
       ) {
@@ -630,7 +631,7 @@ exports.payRent = async (req, res, next) => {
             is_renting_pay: paidType.PAID,
             renting_pay_amount: roomPrice,
             proof_of_payment: payment_no,
-            fine: eachRenitngDetail.fine,
+            fine: typeof eachRenitngDetail.fine=="undefined"?0:eachRenitngDetail.fine,
             pay_by: validateResult.renting_pay_by,
             operate_by: req.user.id,
           },
@@ -679,6 +680,8 @@ exports.payRent = async (req, res, next) => {
             is_trash_pay: paidType.PAID,
             trash_pay_amount: allTrashPrice,
             proof_of_payment: payment_no,
+            pay_by:validateResult.renting_pay_by,
+            operate_by:req.user.id
           },
           {
             where: {
@@ -719,8 +722,9 @@ exports.payRent = async (req, res, next) => {
         );
         totalPrice += parseInt(allTrashPrice);
       }
+    
 
-      if (parseInt(eachRenitngDetail.fine) != 0) {
+      if (typeof eachRenitngDetail.fine !=="undefined"&&parseInt(eachRenitngDetail.fine) != 0) {
         await PaymentDetail.create(
           {
             name:

@@ -19,9 +19,9 @@ export const payRentSchema = Joi.object({
   renting_pay: Joi.array().items(
     Joi.object({
       renting_detail_id:Joi.number().integer().required(),
-      trash_pay:Joi.boolean().required(),
+      trash_pay:Joi.boolean(),
       renting_pay:Joi.boolean().required(),
-      fine:Joi.number().integer().required()
+      fine:Joi.number().integer()
     })
   ).required(),
   renting_id:Joi.number().integer(),
