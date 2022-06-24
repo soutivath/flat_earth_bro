@@ -1567,11 +1567,11 @@ exports.oneRenting = async (req, res, next) => {
         id: renting_id,
       },
       include: [
-        //{model:Room,include:Type}, {model:RentingDetail,include:Trash},
-        {
+        {model:Room,include:Type}, {model:RentingDetail,include:Trash},{
           model: User,
           as: "users",
         },
+        
       ],
     });
     return res.status(200).json({
