@@ -1067,7 +1067,7 @@ exports.checkOut = async (req, res, next) => {
           date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD")
         )
         .toDays() > 30 &&
-      validationResult.validatebypass_checkout == "true"
+      validationResult.bypass_checkout == "true"
     ) {
       throw createHttpError(400, "Please pay renting before checking out");
     }
@@ -1117,7 +1117,7 @@ exports.checkOut = async (req, res, next) => {
         isLastRentingGotDelete = true;
       }
     }
-    if (validationResult.validatebypass_checkout == "true") {
+    if (validationResult.bypass_checkout == "true") {
       let rentingDetailData = await RentingDetail.findAll({
         where: {
           renting_id: renting.id,
