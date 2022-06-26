@@ -1071,7 +1071,7 @@ exports.checkOut = async (req, res, next) => {
     ) {
       throw createHttpError(400, "Please pay renting before checking out");
     }
-
+   
     if (
       !(
         date
@@ -1116,6 +1116,7 @@ exports.checkOut = async (req, res, next) => {
         );
         isLastRentingGotDelete = true;
       }
+    
     }
     if (validationResult.bypass_checkout == true) {
       let rentingDetailData = await RentingDetail.findAll({
@@ -1124,11 +1125,13 @@ exports.checkOut = async (req, res, next) => {
         },
         include: Trash,
       });
+    
       if (
         typeof rentingDetailData !== "undefined" &&
         rentingDetailData.length > 0
       ) {
         for (let eachRenting of rentingDetailData) {
+        
           if (eachRenting.is_renting_pay == paidType.UNPAID) {
             await RentingDetail.update(
               {
@@ -1136,12 +1139,13 @@ exports.checkOut = async (req, res, next) => {
               },
               {
                 where: {
-                  id: rentingDetailData.id,
+                  id: eachRenting.id,
                 },
                 transaction: t,
               }
             );
           }
+         
           if (eachRenting.Trash.is_trash_pay == paidType.UNPAID) {
             await Trash.update(
               {
@@ -1149,14 +1153,16 @@ exports.checkOut = async (req, res, next) => {
               },
               {
                 where: {
-                  rentingdetails_id: rentingDetailData.id,
+                  rentingdetails_id: eachRenting.id,
                 },
                 transaction: t,
               }
             );
           }
+          
         }
       }
+   
 
       await Bill.update({
         is_pay: paidType.PASS,
