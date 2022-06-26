@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     price:DataTypes.INTEGER,
     bill_type:DataTypes.ENUM("electric","water"),
     
-    is_pay:DataTypes.BOOLEAN,
+    is_pay:DataTypes.ENUM("paid","unpaid","pass"),
    
     renting_id:DataTypes.INTEGER,
     proof_of_payment:DataTypes.STRING,
