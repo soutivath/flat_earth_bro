@@ -1157,6 +1157,16 @@ exports.checkOut = async (req, res, next) => {
           }
         }
       }
+
+      await Bill.update({
+        is_pay: paidType.PASS,
+      },{
+        where:{
+          is_pay:paidType.UNPAID,
+          renting_id:renting.id
+        },
+        transaction: t,
+      });
     } else {
       //ຈ່າຍໂຕລ້າສຸດ ພ້ອມ ອອກບິນ
       let unpaidAllRentingDetails;
