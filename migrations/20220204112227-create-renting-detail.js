@@ -27,7 +27,7 @@ module.exports = {
         allowNull: false,
       },
       is_renting_pay:{
-        type:Sequelize.ENUM('paid','unpaid','custom_paid'),
+        type:Sequelize.ENUM('paid','unpaid','custom_paid','pass'),
         allowNull: false,
       },
       renting_pay_amount:{

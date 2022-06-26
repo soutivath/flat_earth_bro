@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       is_trash_pay:{
-        type:Sequelize.ENUM('paid','unpaid','custom_paid'),
+        type:Sequelize.ENUM('paid','unpaid','custom_paid','pass'),
         allowNull: false,
       },
       trash_pay_amount:{
