@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
 
       this.hasOne(models.Payment,{foreignKey:"renting_id"});
 
+      this.hasMany(models.Trash,{foreignKey:"renting_id"});
     //  this.hasMany(models.UserRenting,{foreignKey:"renting_id",as:"nice"});
     }
   }
@@ -32,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     contract_path:DataTypes.STRING,
     user_id:DataTypes.INTEGER,
     staff_id:DataTypes.INTEGER,
+    trash_end_date:DataTypes.DATEONLY,
   }, {
     sequelize,
     modelName: 'Renting',

@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
      // this.belongsTo(models.User,{foreignKey: 'trash_pay_by',as:"trash_pay"});
-      this.belongsTo(models.RentingDetail,{foreignKey: 'rentingdetails_id',as:"rentingdetails"});
+      this.belongsTo(models.Renting,{foreignKey: 'renting_id',as:"renting"});
 
      // this.hasMany(models.Account,{foreignKey:'user_id'});
 
@@ -24,10 +24,12 @@ module.exports = (sequelize, DataTypes) => {
   Trash.init({
     is_trash_pay:DataTypes.ENUM("paid","unpaid","pass"),
     trash_pay_amount:DataTypes.INTEGER,
-    rentingdetails_id: DataTypes.INTEGER,
+    renting_id: DataTypes.INTEGER,
     proof_of_payment:DataTypes.STRING,
     pay_by:DataTypes.INTEGER,
-    operate_by:DataTypes.INTEGER
+    operate_by:DataTypes.INTEGER,
+    start_date:DataTypes.DATEONLY,
+    end_date:DataTypes.DATEONLY,
   }, {
     sequelize,
     modelName: 'Trash',

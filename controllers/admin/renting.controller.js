@@ -41,8 +41,13 @@ exports.checkIn = async (req, res, next) => {
     const now = validateResult.start_renting;
     let nextDate = now;
     let totalPrice = 0;
-    let end_renting_date = date.addDays(now, validateResult.renting_month * 30);
-    if (validateResult.renting_months > 0) {
+    let end_renting_date =date.addDays(now, validateResult.renting_month * 30);
+    let newPaymentData = null;
+    let newPaymentDataNo = null;
+    if(validateResult.renting_pay==false){
+      end_renting_date =date.addDays(now, 1 * 30);
+    }
+    else if (validateResult.renting_months > 0) {
       end_renting_date = date.addDays(
         now,
         validateResult.renting_months * 30 + 2 * 30
@@ -85,23 +90,7 @@ exports.checkIn = async (req, res, next) => {
       }
     );
 
-    let payment = await Payment.create(
-      {
-        pay_by: validateResult.renting_pay_by,
-        total: totalPrice,
-        renting_id: renting.id,
-        operate_by: req.user.id,
-        pay_date: date.format(new Date(), "YYYY-MM-DD HH:mm:ss"),
-
-        // pay_by: validateResult.renting_pay_by,
-        // renting_id: renting.id,
-        // operate_by: req.user.id,
-      },
-      {
-        transaction: t,
-      }
-    );
-    let payment_no = payment.id.toString().padStart(10, "0");
+   
 
     const roomPrice = room.Type.price;
 
@@ -128,6 +117,25 @@ exports.checkIn = async (req, res, next) => {
 
       nextDate = date.addDays(nextDate, 30 * 1);
 
+      if(newPaymentData==null){
+        newPaymentData = await Payment.create(
+         {
+           pay_by: validateResult.renting_pay_by,
+           total: totalPrice,
+           renting_id: renting.id,
+           operate_by: req.user.id,
+           pay_date: date.format(new Date(), "YYYY-MM-DD HH:mm:ss"),
+           // pay_by: validateResult.renting_pay_by,
+           // renting_id: renting.id,
+           // operate_by: req.user.id,
+         },
+         {
+           transaction: t,
+         }
+       );
+        newPaymentDataNo = newPaymentData.id.toString().padStart(10, "0");
+      }
+
       let rentingID = await RentingDetail.create(
         {
           start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
@@ -135,9 +143,8 @@ exports.checkIn = async (req, res, next) => {
           renting_id: renting.id,
           is_renting_pay: paidType.PAID,
           renting_pay_amount: roomPrice,
-          proof_of_payment: payment_no,
+          proof_of_payment: newPaymentData.id,
           pay_by: validateResult.renting_pay_by,
-
           operate_by: req.user.id,
           fine: 0,
         },
@@ -145,12 +152,6 @@ exports.checkIn = async (req, res, next) => {
           transaction: t,
         }
       );
-
-      /*
-
-      ;
-      */
-
       await PaymentDetail.create(
         {
           name:
@@ -161,7 +162,7 @@ exports.checkIn = async (req, res, next) => {
             date.format(nextDate, "YYYY-MM-DD"),
           price: roomPrice,
           type: payment_detail_enum.RENTING.EN,
-          payment_id: payment.id,
+          payment_id: newPaymentData.id,
         },
         {
           transaction: t,
@@ -172,17 +173,38 @@ exports.checkIn = async (req, res, next) => {
       if (validateResult.trash_pay) {
         await Trash.create(
           {
-            rentingdetails_id: rentingID.id,
+            renting_id: renting.id,
             is_trash_pay: paidType.PAID,
             pay_by: validateResult.renting_pay_by,
             operate_by: req.user.id,
             trash_pay_amount: trash_price,
-            proof_of_payment: payment.id,
+            proof_of_payment: newPaymentData.id,
+            start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
+            end_date: nextDate,
           },
           {
             transaction: t,
           }
         );
+
+        if(newPaymentData==null){
+          newPaymentData = await Payment.create(
+           {
+             pay_by: validateResult.renting_pay_by,
+             total: totalPrice,
+             renting_id: renting.id,
+             operate_by: req.user.id,
+             pay_date: date.format(new Date(), "YYYY-MM-DD HH:mm:ss"),
+             // pay_by: validateResult.renting_pay_by,
+             // renting_id: renting.id,
+             // operate_by: req.user.id,
+           },
+           {
+             transaction: t,
+           }
+         );
+          newPaymentDataNo = newPaymentData.id.toString().padStart(10, "0");
+        }
 
         await PaymentDetail.create(
           {
@@ -196,7 +218,7 @@ exports.checkIn = async (req, res, next) => {
               date.format(nextDate, "YYYY-MM-DD").toString(),
             price: trash_price,
             type: payment_detail_enum.TRASH.EN,
-            payment_id: payment.id,
+            payment_id: newPaymentData.id,
           },
           {
             transaction: t,
@@ -207,8 +229,11 @@ exports.checkIn = async (req, res, next) => {
       } else {
         await Trash.create(
           {
-            rentingdetails_id: rentingID.id,
+            renting_id: renting.id,
             is_trash_pay: paidType.UNPAID,
+            start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
+            end_date: nextDate,
+            
           },
           {
             transaction: t,
@@ -236,8 +261,11 @@ exports.checkIn = async (req, res, next) => {
 
       await Trash.create(
         {
-          rentingdetails_id: rentingID.id,
+          renting_id: renting.id,
           is_trash_pay: paidType.UNPAID,
+          start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
+          end_date: nextDate,
+          
         },
         {
           transaction: t,
@@ -266,8 +294,13 @@ exports.checkIn = async (req, res, next) => {
 
           await Trash.create(
             {
-              rentingdetails_id: rentingID.id,
+              renting_id: renting.id,
               is_trash_pay: paidType.UNPAID,
+              start_date: date.format(
+                date.addDays(nextDate, i * 30),
+                "YYYY-MM-DD"
+              ),
+              end_date: date.addDays(nextDate, i * 30 + 1 * 30),
             },
             {
               transaction: t,
@@ -294,6 +327,24 @@ exports.checkIn = async (req, res, next) => {
               transaction: t,
             }
           );
+          if(newPaymentData==null){
+            newPaymentData = await Payment.create(
+             {
+               pay_by: validateResult.renting_pay_by,
+               total: totalPrice,
+               renting_id: renting.id,
+               operate_by: req.user.id,
+               pay_date: date.format(new Date(), "YYYY-MM-DD HH:mm:ss"),
+               // pay_by: validateResult.renting_pay_by,
+               // renting_id: renting.id,
+               // operate_by: req.user.id,
+             },
+             {
+               transaction: t,
+             }
+           );
+            newPaymentDataNo = newPaymentData.id.toString().padStart(10, "0");
+          }
 
           await PaymentDetail.create(
             {
@@ -309,7 +360,7 @@ exports.checkIn = async (req, res, next) => {
                   .toString(),
               price: roomPrice,
               type: payment_detail_enum.RENTING.EN,
-              payment_id: payment.id,
+              payment_id: newPaymentData.id,
             },
             {
               transaction: t,
@@ -323,12 +374,17 @@ exports.checkIn = async (req, res, next) => {
           ) {
             await Trash.create(
               {
-                rentingdetails_id: rentingID.id,
+                renting_id: renting.id,
                 is_trash_pay: paidType.PAID,
                 trash_pay_amount: trash_price,
-                proof_of_payment: payment.id,
+                proof_of_payment: newPaymentData.id,
                 pay_by: validateResult.renting_pay_by,
                 operate_by: req.user.id,
+                start_date: date.format(
+                  date.addDays(nextDate, i * 30),
+                  "YYYY-MM-DD"
+                ),
+                end_date: date.addDays(nextDate, i * 30 + 1 * 30),
               },
               {
                 transaction: t,
@@ -349,7 +405,7 @@ exports.checkIn = async (req, res, next) => {
                     .toString(),
                 price: trash_price,
                 type: payment_detail_enum.TRASH.EN,
-                payment_id: payment.id,
+                payment_id: newPaymentData.id,
               },
               {
                 transaction: t,
@@ -359,8 +415,13 @@ exports.checkIn = async (req, res, next) => {
           } else {
             await Trash.create(
               {
-                rentingdetails_id: rentingID.id,
+                renting_id: renting.id,
                 is_trash_pay: paidType.UNPAID,
+                start_date: date.format(
+                  date.addDays(nextDate, i * 30),
+                  "YYYY-MM-DD"
+                ),
+                end_date: date.addDays(nextDate, i * 30 + 1 * 30),
               },
               {
                 transaction: t,
@@ -497,18 +558,20 @@ exports.checkIn = async (req, res, next) => {
       }
     );
 
+   if(newPaymentData!=null){
     await Payment.update(
       {
-        payment_no: payment_no,
+        payment_no: newPaymentDataNo,
         total: totalPrice,
       },
       {
         where: {
-          id: payment.id,
+          id: newPaymentData.id,
         },
         transaction: t,
       }
     );
+   }
 
     await t.commit();
     return res.status(200).json({
@@ -1174,17 +1237,9 @@ exports.checkOut = async (req, res, next) => {
         transaction: t,
       });
 
-      await Renting.update(
-        {
-          end_renting_date: nowDate,
-        },
-        {
-          where: {
-            id: renting.id,
-          },
-          transaction: t,
-        }
-      );
+      //updatenice
+     
+      
     
 
 
@@ -1202,9 +1257,7 @@ exports.checkOut = async (req, res, next) => {
             },
             include: Trash,
           },
-          {
-            transaction: t,
-          }
+          
         );
       } else {
         unpaidAllRentingDetails = await RentingDetail.findAll(
