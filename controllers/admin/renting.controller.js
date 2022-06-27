@@ -1173,6 +1173,21 @@ exports.checkOut = async (req, res, next) => {
         },
         transaction: t,
       });
+
+      await Renting.update(
+        {
+          end_renting_date: nowDate,
+        },
+        {
+          where: {
+            id: renting.id,
+          },
+          transaction: t,
+        }
+      );
+    
+
+
     } else {
       //ຈ່າຍໂຕລ້າສຸດ ພ້ອມ ອອກບິນ
       let unpaidAllRentingDetails;
