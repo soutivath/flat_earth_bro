@@ -1660,7 +1660,7 @@ exports.oneRenting = async (req, res, next) => {
         where: {
           renting_id: renting_id,
         },
-        limit: 2,
+        limit: 1,
         order: [["end_date", "DESC"]],
         include: Trash,
       });
@@ -1685,12 +1685,8 @@ exports.oneRenting = async (req, res, next) => {
           transaction:t
         });
         await Trash.create({
-          rentingdetail_id: rentingID.id,
+          rentingdetail_id: newRentingDetailData.id,
             is_trash_pay: paidType.UNPAID,
-            pay_by: validateResult.renting_pay_by,
-            operate_by: req.user.id,
-            trash_pay_amount: trash_price,
-            proof_of_payment: newPaymentData.id,
         },{
           transaction:t
         });

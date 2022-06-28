@@ -7,7 +7,7 @@ import * as admin from "firebase-admin";
 import createHttpError from "http-errors";
 exports.getCurrentNotification = async (req,res,next) => {
     try{
-        const notificationData = await Notification.findOne({
+        const notificationData = await Notification.findAll({
             where:{
                 id:req.user.id
             },
