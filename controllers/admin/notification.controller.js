@@ -15,13 +15,15 @@ import date from "date-and-time";
 var admin = require("firebase-admin");
 exports.sendNotification = async (req, res, next) => {
   const t = await sequelize.transaction();
+ 
   try {
+   
     const validationResult = await sendNotificationSchema.validateAsync(
       req.body
     );
-
+  
     const now = date.format(new Date(), "YYYY-MM-DD");
-
+   
     for (let eachUser of validationResult.user_id) {
       const user = await User.findOne(
         {
@@ -34,9 +36,14 @@ exports.sendNotification = async (req, res, next) => {
           transaction: t,
         }
       );
-      if (!user) {
-        throw createHttpError.NotFound("User not found try again");
-      }
+    
+    
+     
+
+     if(!user) {
+      throw createHttpError(404, "User not found");
+     }
+   
 
      let notification =  await Notification.create(
         {
@@ -49,6 +56,7 @@ exports.sendNotification = async (req, res, next) => {
           transaction: t,
         }
       );
+      
 
       if (user.Account.personal_option == true) {
         const message = {
@@ -90,6 +98,7 @@ exports.sendNotification = async (req, res, next) => {
 exports.sendGlobalNotification = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
+ 
     const validationResult = await sendAllNotificationSchema.validateAsync(
       req.body
     );

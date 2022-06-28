@@ -1653,8 +1653,8 @@ exports.oneRenting = async (req, res, next) => {
       ],
     });
 
-    if(rentingData.active == 1){
-    
+    if(rentingData.is_active == 1){
+   
       let nowDate = new Date();
       const twoLastedRecord = await RentingDetail.findAll({
         where: {
@@ -1667,14 +1667,16 @@ exports.oneRenting = async (req, res, next) => {
 
       let endDate = date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD");
 
+   
+    
       while(date
         .subtract(
-          date.parse(nowDate, "YYYY-MM-DD"),
+          nowDate,
           endDate
         )
-        .toDays() > 30)
+        .toDays() >= 0 )
       {
-      
+       
         let newRentingDetailData = await RentingDetail.create({
           start_date: endDate,
           renting_id: renting_id,
@@ -1693,6 +1695,7 @@ exports.oneRenting = async (req, res, next) => {
         endDate = date.addDays(endDate,30);
       }
 
+      
     }
     await t.commit();
     return res.status(200).json({
