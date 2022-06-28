@@ -16,11 +16,11 @@ module.exports = {
         type:Sequelize.INTEGER,
         allowNull: true,
       },
-      renting_id: {
+      rentingdetail_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references:{
-          model:"rentings",
+          model:"rentingdetails",
           key:"id",
           onDelete:"CASCADE"
         }
@@ -47,18 +47,8 @@ module.exports = {
         allowNull: true,
         type:Sequelize.STRING,
       },
-      start_date: {
-        type:Sequelize.DATEONLY,
-        allowNull: false,
-      },
-      end_date: {
-        type:Sequelize.DATEONLY,
-        allowNull: false,
-      },
-      trash_end_date: {
-        type:Sequelize.DATEONLY,
-        allowNull: false,
-      },
+
+      
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

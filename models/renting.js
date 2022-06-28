@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
 
       this.hasOne(models.Payment,{foreignKey:"renting_id"});
 
-      this.hasMany(models.Trash,{foreignKey:"renting_id"});
+    //  this.hasMany(models.Trash,{foreignKey:"renting_id"});
     //  this.hasMany(models.UserRenting,{foreignKey:"renting_id",as:"nice"});
     }
   }

@@ -173,14 +173,13 @@ exports.checkIn = async (req, res, next) => {
       if (validateResult.trash_pay) {
         await Trash.create(
           {
-            renting_id: renting.id,
+            rentingdetail_id: rentingID.id,
             is_trash_pay: paidType.PAID,
             pay_by: validateResult.renting_pay_by,
             operate_by: req.user.id,
             trash_pay_amount: trash_price,
             proof_of_payment: newPaymentData.id,
-            start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
-            end_date: nextDate,
+            
           },
           {
             transaction: t,
@@ -229,10 +228,9 @@ exports.checkIn = async (req, res, next) => {
       } else {
         await Trash.create(
           {
-            renting_id: renting.id,
+            rentingdetail_id: rentingID.id,
             is_trash_pay: paidType.UNPAID,
-            start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
-            end_date: nextDate,
+            
             
           },
           {
@@ -261,10 +259,9 @@ exports.checkIn = async (req, res, next) => {
 
       await Trash.create(
         {
-          renting_id: renting.id,
+          rentingdetail_id: rentingID.id,
           is_trash_pay: paidType.UNPAID,
-          start_date: date.format(date.addDays(nextDate, -30), "YYYY-MM-DD"),
-          end_date: nextDate,
+        
           
         },
         {
@@ -294,13 +291,9 @@ exports.checkIn = async (req, res, next) => {
 
           await Trash.create(
             {
-              renting_id: renting.id,
+              rentingdetail_id: rentingID.id,
               is_trash_pay: paidType.UNPAID,
-              start_date: date.format(
-                date.addDays(nextDate, i * 30),
-                "YYYY-MM-DD"
-              ),
-              end_date: date.addDays(nextDate, i * 30 + 1 * 30),
+            
             },
             {
               transaction: t,
@@ -318,7 +311,7 @@ exports.checkIn = async (req, res, next) => {
               is_trash_pay: paidType.PAID,
               is_renting_pay: paidType.PAID,
               renting_pay_amount: roomPrice,
-              proof_of_payment: payment_no,
+              proof_of_payment: newPaymentDataNo,
               pay_by: validateResult.renting_pay_by,
               operate_by: req.user.id,
               fine: 0,
@@ -374,17 +367,13 @@ exports.checkIn = async (req, res, next) => {
           ) {
             await Trash.create(
               {
-                renting_id: renting.id,
+                rentingdetail_id: rentingID.id,
                 is_trash_pay: paidType.PAID,
                 trash_pay_amount: trash_price,
                 proof_of_payment: newPaymentData.id,
                 pay_by: validateResult.renting_pay_by,
                 operate_by: req.user.id,
-                start_date: date.format(
-                  date.addDays(nextDate, i * 30),
-                  "YYYY-MM-DD"
-                ),
-                end_date: date.addDays(nextDate, i * 30 + 1 * 30),
+              
               },
               {
                 transaction: t,
@@ -417,11 +406,7 @@ exports.checkIn = async (req, res, next) => {
               {
                 renting_id: renting.id,
                 is_trash_pay: paidType.UNPAID,
-                start_date: date.format(
-                  date.addDays(nextDate, i * 30),
-                  "YYYY-MM-DD"
-                ),
-                end_date: date.addDays(nextDate, i * 30 + 1 * 30),
+               
               },
               {
                 transaction: t,
@@ -1629,6 +1614,10 @@ exports.getAllRenting = async (req, res, next) => {
       }
     }
 
+    
+   
+
+
     let allRentingData = await Renting.findAll({
       where: option,
       include: [Bill, { model: Room, include: Type }],
@@ -1648,6 +1637,7 @@ exports.getAllRenting = async (req, res, next) => {
 };
 
 exports.oneRenting = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
     let renting_id = req.params.id;
     const rentingData = await Renting.findOne({
@@ -1662,6 +1652,53 @@ exports.oneRenting = async (req, res, next) => {
         
       ],
     });
+
+    if(rentingData.active == 1){
+    
+      let nowDate = new Date();
+      const twoLastedRecord = await RentingDetail.findAll({
+        where: {
+          renting_id: renting_id,
+        },
+        limit: 2,
+        order: [["end_date", "DESC"]],
+        include: Trash,
+      });
+
+      let endDate = date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD");
+
+      while(date
+        .subtract(
+          date.parse(nowDate, "YYYY-MM-DD"),
+          endDate
+        )
+        .toDays() > 30)
+      {
+      
+        let newRentingDetailData = await RentingDetail.create({
+          start_date: endDate,
+          renting_id: renting_id,
+          end_date: date.addDays(endDate, 30),
+          is_renting_pay: paidType.UNPAID
+       
+        },{
+          transaction:t
+        });
+        await Trash.create({
+          rentingdetail_id: rentingID.id,
+            is_trash_pay: paidType.UNPAID,
+            pay_by: validateResult.renting_pay_by,
+            operate_by: req.user.id,
+            trash_pay_amount: trash_price,
+            proof_of_payment: newPaymentData.id,
+        },{
+          transaction:t
+        });
+        endDate = date.addDays(endDate,30);
+      }
+
+    }
+    await t.commit();
     return res.status(200).json({
       data: rentingData,
       message: "get data successfully",
