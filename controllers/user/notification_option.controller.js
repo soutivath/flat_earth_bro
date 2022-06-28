@@ -51,6 +51,7 @@ exports.changeNotification = async (req,res,next)=>{
             where:{
                user_id:req.user.id
             },
+            
         
         });
         if(!account){
@@ -61,12 +62,12 @@ exports.changeNotification = async (req,res,next)=>{
            if(validatedResult.personal_option){
             await admin
             .messaging()
-            .subscribeToTopic([validatedResult.firebaseFCM], account.notification_topic);
+            .subscribeToTopic([account.fcm], account.notification_topic);
            }
            else{
             await admin
             .messaging()
-            .unsubscribeFromTopic([validatedResult.firebaseFCM], account.notification_topic)
+            .unsubscribeFromTopic([account.fcm], account.notification_topic)
            }
        }
        if(validatedResult.global_option!=account.global_option){
@@ -74,14 +75,14 @@ exports.changeNotification = async (req,res,next)=>{
             await admin
             .messaging()
             .subscribeToTopic(
-              [validatedResult.firebaseFCM],
+              [account.fcm],
               GLOBAL_TOPIC.GLOBAL_TOPIC
             );
            }else{
             await admin
             .messaging()
             .unsubscribeFromTopic(
-              [validatedResult.firebaseFCM],
+              [account.fcm],
               GLOBAL_TOPIC.GLOBAL_TOPIC
             );
            }

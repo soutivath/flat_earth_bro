@@ -4,5 +4,5 @@ export default Joi.object({
     
     "personal_option":Joi.boolean().required(),
     "global_option":Joi.boolean().required(),
-    "firebaseFCM":Joi.string().required()
+    //"firebaseFCM":Joi.string().required()
 });
