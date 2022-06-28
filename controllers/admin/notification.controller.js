@@ -61,7 +61,7 @@ exports.sendNotification = async (req, res, next) => {
       if (user.Account.personal_option == true) {
         const message = {
           data: {
-            id: notification.id,
+            id: notification.id.toString(),
             message: validationResult.message,
             route: "/private_notification_detail",
           },
@@ -112,7 +112,7 @@ exports.sendGlobalNotification = async (req, res, next) => {
     const message = {
       data: {
         message: validationResult.message,
-        id: globalNotificaion.id,
+        id: globalNotificaion.id.toString(),
         route: "/global_notification_detail",
       },
       topic: GLOBALTOPIC.GLOBAL_TOPIC,
