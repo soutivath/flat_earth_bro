@@ -733,7 +733,7 @@ exports.payRent = async (req, res, next) => {
           },
           {
             where: {
-              rentingdetails_id: eachRenitngDetail.renting_detail_id,
+              rentingdetail_id: eachRenitngDetail.renting_detail_id,
             },
             transaction: t,
           }
@@ -849,7 +849,7 @@ exports.payRent = async (req, res, next) => {
 
         await Trash.create(
           {
-            rentingdetails_id: newRentingId.id,
+            rentingdetail_id: newRentingId.id,
             is_trash_pay: paidType.UNPAID,
           },
           {
@@ -892,7 +892,7 @@ exports.payRent = async (req, res, next) => {
 
           await Trash.create(
             {
-              rentingdetails_id: emptyRenting.id,
+              rentingdetail_id: emptyRenting.id,
               is_trash_pay: paidType.UNPAID,
             },
             {
@@ -949,7 +949,7 @@ exports.payRent = async (req, res, next) => {
           ) {
             await Trash.create(
               {
-                rentingdetails_id: newPaidRentingDetail.id,
+                rentingdetail_id: newPaidRentingDetail.id,
                 is_trash_pay: paidType.PAID,
                 trash_pay_amount: allTrashPrice,
                 proof_of_payment: payment.id,
@@ -983,7 +983,7 @@ exports.payRent = async (req, res, next) => {
           } else {
             await Trash.create(
               {
-                rentingdetails_id: newPaidRentingDetail.id,
+                rentingdetail_id: newPaidRentingDetail.id,
                 is_trash_pay: paidType.UNPAID,
               },
               {
@@ -1201,7 +1201,7 @@ exports.checkOut = async (req, res, next) => {
               },
               {
                 where: {
-                  rentingdetails_id: eachRenting.id,
+                  rentingdetail_id: eachRenting.id,
                 },
                 transaction: t,
               }
@@ -1405,7 +1405,7 @@ exports.checkOut = async (req, res, next) => {
                 },
                 {
                   where: {
-                    rentingdetails_id: checkId,
+                    rentingdetail_id: checkId,
                   },
                   transaction: t,
                 }
