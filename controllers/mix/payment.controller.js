@@ -42,7 +42,10 @@ exports.onePayment = async(req,res,next)=>{
 exports.payments = async(req,res,next)=>{
     try{
         const data = await Payment.findAll({
-            include:[Renting,"payBy","operateBy",PaymentDetail]
+            include:[{
+                model:Renting,
+                include:Room
+            },"payBy","operateBy",PaymentDetail]
         });
         return res.status(200).json({
             data:data,
