@@ -35,6 +35,8 @@ exports.viewRentingWithDetail = async (data) => {
       createdAt: room.createdAt,
       updatedAt: room.updatedAt,
       allImages: allImages,
+      electric_motor_number:room.electric_motor_number,
+      water_motor_number:room.electric_motor_number,
       type: {
         id: type.id,
         name: type.name,

@@ -93,23 +93,23 @@ exports.checkIn = async (req, res, next) => {
 
     const roomPrice = room.Type.price;
 
-    let rentingDetailOption = {
-      renting_id: renting.id,
-      is_trash_pay:
-        validateResult.trash_pay == true ? paidType.PAID : paidType.UNPAID,
-      is_renting_pay:
-        validateResult.renting_pay == true ? paidType.PAID : paidType.UNPAID,
-      // trash_pay_amount: 0,
-    };
+    // let rentingDetailOption = {
+    //   renting_id: renting.id,
+    //   is_trash_pay:
+    //     validateResult.trash_pay == true ? paidType.PAID : paidType.UNPAID,
+    //   is_renting_pay:
+    //     validateResult.renting_pay == true ? paidType.PAID : paidType.UNPAID,
+    //   // trash_pay_amount: 0,
+    // };
 
     if (validateResult.renting_pay) {
-      rentingDetailOption.renting_pay_amount = room.Type.price;
+    //  rentingDetailOption.renting_pay_amount = room.Type.price;
       if (validateResult.renting_pay_by) {
         const user = await User.findByPk(validateResult.renting_pay_by);
         if (!user) {
           throw createHttpError(404, "user not found");
         }
-        rentingDetailOption.renting_pay_by = validateResult.renting_pay_by;
+     //   rentingDetailOption.renting_pay_by = validateResult.renting_pay_by;
       } else {
         throw createHttpError(422, "Please provide a user id");
       }
