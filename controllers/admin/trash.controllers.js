@@ -77,7 +77,7 @@ exports.payTrash = async (req, res, next) => {
     }
       
     );
-
+   
     if (!trash_detail) createHttpError.NotFound("Trash not found");
 
     if (trash_detail.is_trash_pay==paidType.PAID) {
@@ -86,7 +86,7 @@ exports.payTrash = async (req, res, next) => {
   
 
 
-    if(trash_detail.rentingdetails.renting_id!=validationResult.renting_id){
+    if(trash_detail.rentingdetail.renting_id!=validationResult.renting_id){
       throw createHttpError(400,"Some record not match Renting Detail");
     }
  
@@ -113,8 +113,8 @@ exports.payTrash = async (req, res, next) => {
     
     await PaymentDetail.create({
       name: payment_detail_enum.TRASH.LA +
-      "ວັນທີ " +(date.format(date.addDays(date.parse(trash_detail.rentingdetails.end_date, "YYYY-MM-DD"),-30), "YYYY-MM-DD")).toString()+" - "+
-      date.format(date.parse(trash_detail.rentingdetails.end_date, "YYYY-MM-DD"),"YYYY-MM-DD").toString(),
+      "ວັນທີ " +(date.format(date.addDays(date.parse(trash_detail.rentingdetail.end_date, "YYYY-MM-DD"),-30), "YYYY-MM-DD")).toString()+" - "+
+      date.format(date.parse(trash_detail.rentingdetail.end_date, "YYYY-MM-DD"),"YYYY-MM-DD").toString(),
       price:trash_price.value,
       type:payment_detail_enum.TRASH.EN,
       payment_id:payment.id
@@ -254,7 +254,7 @@ exports.oneTrash = async(req,res,next)=>{
       where:{
         id:trash_id
       },
-     include:["rentingdetails","trash_pay_by","trash_operate_by"]
+     include:["rentingdetail","trash_pay_by","trash_operate_by"]
     });
     return res.status(200).json({data:trash_data,message:"Get data successfully",success:true});
   }catch(err){

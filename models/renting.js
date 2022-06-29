@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     contract_path:DataTypes.STRING,
     user_id:DataTypes.INTEGER,
     staff_id:DataTypes.INTEGER,
-    trash_end_date:DataTypes.DATEONLY,
+  
   }, {
     sequelize,
     modelName: 'Renting',
