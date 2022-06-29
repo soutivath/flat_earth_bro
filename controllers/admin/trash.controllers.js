@@ -73,7 +73,7 @@ exports.payTrash = async (req, res, next) => {
       where:{
         id:eachTrashPay
       },
-      include:"rentingdetails"
+      include:"rentingdetail"
     }
       
     );
@@ -158,6 +158,7 @@ exports.payTrash = async (req, res, next) => {
 };
 
 exports.getTrashDataFromRenting = async(req,res,next)=>{
+  const t  = await sequelize.transaction();
   try{
     const query = {};
     const queryParam = req.query.isPaid;
@@ -176,10 +177,70 @@ exports.getTrashDataFromRenting = async(req,res,next)=>{
       where:{
         id:renting_id
       },
+     // include:[Room,{model:RentingDetail,include:[{model:Trash,where:query}]}]
+    });
+
+    if(rentingData.is_active == 1){
+   
+      let nowDate = new Date();
+      const twoLastedRecord = await RentingDetail.findAll({
+        where: {
+          renting_id: renting_id,
+        },
+        limit: 1,
+        order: [["end_date", "DESC"]],
+        include: Trash,
+      });
+
+      let endDate = date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD");
+      while(date
+        .subtract(
+          nowDate,
+          endDate
+        )
+        .toDays() >= 0 )
+      {
+       
+        let newRentingDetailData = await RentingDetail.create({
+          start_date: endDate,
+          renting_id: renting_id,
+          end_date: date.addDays(endDate, 30),
+          is_renting_pay: paidType.UNPAID
+       
+        },{
+          transaction:t
+        });
+        await Trash.create({
+          rentingdetail_id: newRentingDetailData.id,
+            is_trash_pay: paidType.UNPAID,
+        },{
+          transaction:t
+        });
+        endDate = date.addDays(endDate,30);
+      }
+
+      await Renting.update({
+        end_renting_date:date.format(endDate,"YYYY-MM-DD"),
+      },{
+        where:{
+          id:renting_id
+        },
+        transaction:t
+      });
+    }
+
+    await t.commit();
+    const newRentingData = await Renting.findOne({
+      where:{
+        id:renting_id
+      },
       include:[Room,{model:RentingDetail,include:[{model:Trash,where:query}]}]
     });
-    return res.status(200).json({data:rentingData,message:"Get data successfully",success:true});
+
+   
+    return res.status(200).json({data:newRentingData,message:"Get data successfully",success:true});
   }catch(err){
+    await t.rollback();
     next(err);
   }
 }

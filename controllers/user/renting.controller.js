@@ -5,6 +5,7 @@ import createHttpError from "http-errors";
 //get where active
 exports.getCurrentRenting = async (req,res,next)=>{
     try{
+      
         const renting = await UserRenting.findAll({
             where:{
                 user_id:req.user.id

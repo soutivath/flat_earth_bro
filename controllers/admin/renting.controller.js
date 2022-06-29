@@ -1205,8 +1205,8 @@ exports.checkOut = async (req, res, next) => {
       for (let eachUnpaid of unpaidAllRentingDetails) {
         if (eachUnpaid.id != checkId) {
           if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
-            console.log(checkId);
-            console.log(eachUnpaid.id);
+            // console.log(checkId);
+            // console.log(eachUnpaid.id);
             throw createHttpError(400, "Some renting not paid");
           }
           if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
@@ -1539,19 +1539,19 @@ exports.checkOut = async (req, res, next) => {
       let checkId = null;
 
       if (isLastRentingGotDelete) {
-        console.log(true);
+       // console.log(true);
         checkId = twoLastedRecord[1].id;
       } else {
-        console.log(false);
+     //   console.log(false);
         checkId = twoLastedRecord[0].id;
-        console.log(checkId);
+   //     console.log(checkId);
       }
 
       for (let eachUnpaid of unpaidAllRentingDetails) {
         if (eachUnpaid.id != checkId) {
           if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
-            console.log(checkId);
-            console.log(eachUnpaid.id);
+            // console.log(checkId);
+            // console.log(eachUnpaid.id);
             throw createHttpError(400, "Some renting not paid");
           }
           if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
@@ -1925,13 +1925,13 @@ exports.oneRenting = async (req, res, next) => {
       where: {
         id: renting_id,
       },
-      include: [
-        {model:Room,include:Type}, {model:RentingDetail,include:Trash},{
-          model: User,
-          as: "users",
-        },
+      // include: [
+      //   {model:Room,include:Type}, {model:RentingDetail,include:Trash},{
+      //     model: User,
+      //     as: "users",
+      //   },
         
-      ],
+      // ],
     });
 
     if(rentingData.is_active == 1){
@@ -1983,8 +1983,21 @@ exports.oneRenting = async (req, res, next) => {
       });
     }
     await t.commit();
+
+    const newRentingData = await Renting.findOne({
+      where: {
+        id: renting_id,
+      },
+      include: [
+        {model:Room,include:Type}, {model:RentingDetail,include:Trash},{
+          model: User,
+          as: "users",
+        },
+        
+      ],
+    });
     return res.status(200).json({
-      data: rentingData,
+      data: newRentingData,
       message: "get data successfully",
       success: true,
     });
