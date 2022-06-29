@@ -1,5 +1,5 @@
 
-import {sequelize,Payment,PaymentDetail,User,Renting} from "../../models";
+import {sequelize,Payment,PaymentDetail,User,Renting,Room} from "../../models";
 
 exports.paymentRenting = async (req,res,next)=>{
     try{
