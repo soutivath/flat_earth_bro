@@ -35,7 +35,6 @@ import rentingdetail from "../../models/rentingdetail";
 
 exports.checkIn = async (req, res, next) => {
   const t = await sequelize.transaction();
-
   try {
     const validateResult = await checkInSchema.validateAsync(req.body);
     const now = validateResult.start_renting;
@@ -1120,6 +1119,285 @@ exports.checkOut = async (req, res, next) => {
       throw createHttpError(400, "Please pay renting before checking out");
     }
    
+
+
+   if(!twoLastedRecord[1]){
+    if (validationResult.bypass_checkout == true) {
+      let rentingDetailData = await RentingDetail.findAll({
+        where: {
+          renting_id: renting.id,
+        },
+        include: Trash,
+      });
+    
+      if (
+        typeof rentingDetailData !== "undefined" &&
+        rentingDetailData.length > 0
+      ) {
+        for (let eachRenting of rentingDetailData) {
+        
+          if (eachRenting.is_renting_pay == paidType.UNPAID) {
+            await RentingDetail.update(
+              {
+                is_renting_pay: paidType.PASS,
+              },
+              {
+                where: {
+                  id: eachRenting.id,
+                },
+                transaction: t,
+              }
+            );
+          }
+         
+          if (eachRenting.Trash.is_trash_pay == paidType.UNPAID) {
+            await Trash.update(
+              {
+                is_trash_pay: paidType.PASS,
+              },
+              {
+                where: {
+                  rentingdetail_id: eachRenting.id,
+                },
+                transaction: t,
+              }
+            );
+          }
+          
+        }
+      }
+   
+
+      await Bill.update({
+        is_pay: paidType.PASS,
+      },{
+        where:{
+          is_pay:paidType.UNPAID,
+          renting_id:renting.id
+        },
+        transaction: t,
+      });
+
+      //updatenice
+     
+      
+    
+
+
+    } else {
+      //ຈ່າຍໂຕລ້າສຸດ ພ້ອມ ອອກບິນ
+      let unpaidAllRentingDetails = await RentingDetail.findAll(
+          {
+            where: {
+              renting_id: renting.id,
+            },
+            include: Trash,
+          },
+          {
+            transaction: t,
+          }
+        );
+      
+
+      let checkId = twoLastedRecord[0].id;
+      
+     
+      for (let eachUnpaid of unpaidAllRentingDetails) {
+        if (eachUnpaid.id != checkId) {
+          if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
+            console.log(checkId);
+            console.log(eachUnpaid.id);
+            throw createHttpError(400, "Some renting not paid");
+          }
+          if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
+            throw createHttpError(400, "Some Trash not paid");
+          }
+        } else {
+          if (!validationResult.pay_last_renting) {
+            throw createHttpError(400, "Please provide a payment detail");
+          }
+          let paidBy = await User.findOne(
+            {
+              where: {
+                id: validationResult.renting_pay_by,
+              },
+            },
+            {
+              transaction: t,
+            }
+          );
+          if (!paidBy) {
+            throw createHttpError(404, "User not found");
+          }
+
+         
+
+          if (eachUnpaid.is_renting_pay == paidType.UNPAID) {
+            
+            if (checkout_payment == null) {
+              checkout_payment = await Payment.create(
+                {
+                  pay_by: validationResult.renting_pay_by,
+                  renting_id: renting.id,
+                  operate_by: req.user.id,
+                  pay_date:new Date(),
+                },
+                {
+                  transaction: t,
+                }
+              );
+
+              
+
+              checkout_no = checkout_payment.id.toString().padStart(10, "0");
+              await RentingDetail.update(
+                {
+                  is_renting_pay: paidType.PAID,
+                  end_date: nowDate,
+                  renting_pay_amount: validationResult.amount,
+                  proof_of_payment: checkout_no,
+                  pay_by: validationResult.renting_pay_by,
+                  operate_by: req.user.id,
+                },
+                {
+                  where: {
+                    id: checkId,
+                  },
+                  transaction: t,
+                }
+              );
+
+              total+= parseInt(validationResult.amount);
+
+              await Renting.update(
+                {
+                  end_renting_date: nowDate,
+                },
+                {
+                  where: {
+                    id: renting.id,
+                  },
+                  transaction: t,
+                }
+              );
+
+              await PaymentDetail.create(
+                {
+                  name:
+                    "ຈ່າຍຄ່າພັກເຊົ່າ ແລະ " +
+                    payment_detail_enum.CHECKOUT.LA +
+                    "ວັນທີ " +
+                    date
+                      .format(
+                        date.addDays(
+                          date.parse(eachUnpaid.end_date, "YYYY-MM-DD"),
+                          -30
+                        ),
+                        "YYYY-MM-DD"
+                      )
+                      .toString() +
+                    " - " +
+                    date
+                      .format(date.parse(nowDate, "YYYY-MM-DD"), "YYYY-MM-DD")
+                      .toString(),
+                  price: validationResult.amount,
+                  type: payment_detail_enum.CHECKOUT.EN,
+                  payment_id: checkout_payment.id,
+                },
+                {
+                  transaction: t,
+                }
+              );
+            }
+          }
+          ////////////////////////////////////////////////////////////////
+
+        
+          if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
+            if (checkout_payment == null) {
+              checkout_payment = await Payment.create(
+                {
+                  pay_by: validationResult.renting_pay_by,
+                  renting_id: renting.id,
+                  operate_by: req.user.id,
+                  pay_date:new Date(),
+                },
+                {
+                  transaction: t,
+                }
+              );
+
+              checkout_no = checkout_payment.id.toString().padStart(10, "0");
+            }
+              
+                await Trash.update(
+                {
+                  is_trash_pay: paidType.PAID,
+                  trash_pay_amount: validationResult.trash_amount,
+                  proof_of_payment: checkout_payment.id,
+                  pay_by: validationResult.renting_pay_by,
+                  operate_by: req.user.id,
+                },
+                {
+                  where: {
+                    rentingdetail_id: checkId,
+                  },
+                  transaction: t,
+                }
+              );
+           
+
+              total+= parseInt(validationResult.trash_amount);
+
+              await Renting.update(
+                {
+                  end_renting_date: nowDate,
+                },
+                {
+                  where: {
+                    id: renting.id,
+                  },
+                  transaction: t,
+                }
+              );
+
+              await PaymentDetail.create(
+                {
+                  name:
+                    "ຈ່າຍຄ່າຂີ້ເຫຍື້ອ ແລະ " +
+                    payment_detail_enum.CHECKOUT.LA +
+                    "ວັນທີ " +
+                    date
+                      .format(
+                        date.addDays(
+                          date.parse(eachUnpaid.end_date, "YYYY-MM-DD"),
+                          -30
+                        ),
+                        "YYYY-MM-DD"
+                      )
+                      .toString() +
+                    " - " +
+                    date
+                      .format(date.parse(nowDate, "YYYY-MM-DD"), "YYYY-MM-DD")
+                      .toString(),
+                  price: validationResult.trash_amount,
+                  type: payment_detail_enum.CHECKOUT.EN,
+                  payment_id: checkout_payment.id,
+                },
+                {
+                  transaction: t,
+                }
+              );
+            
+          }
+     
+      
+          /////////////////////////////////////////////////////
+        }
+      }
+    }
+    /////////////////////////////////////////
+   }else{
     if (
       !(
         date
@@ -1317,6 +1595,7 @@ exports.checkOut = async (req, res, next) => {
               
 
               checkout_no = checkout_payment.id.toString().padStart(10, "0");
+            }
               await RentingDetail.update(
                 {
                   is_renting_pay: paidType.PAID,
@@ -1375,7 +1654,7 @@ exports.checkOut = async (req, res, next) => {
                   transaction: t,
                 }
               );
-            }
+          //  }
           }
           ////////////////////////////////////////////////////////////////
 
@@ -1395,6 +1674,7 @@ exports.checkOut = async (req, res, next) => {
               );
 
               checkout_no = checkout_payment.id.toString().padStart(10, "0");
+            }
               await Trash.update(
                 {
                   is_trash_pay: paidType.PAID,
@@ -1452,13 +1732,14 @@ exports.checkOut = async (req, res, next) => {
                   transaction: t,
                 }
               );
-            }
+            
           }
 
           /////////////////////////////////////////////////////
         }
       }
     }
+  }
 
     if (checkout_payment != null) {
       checkout_payment.payment_no = checkout_no;
@@ -1666,9 +1947,6 @@ exports.oneRenting = async (req, res, next) => {
       });
 
       let endDate = date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD");
-
-   
-    
       while(date
         .subtract(
           nowDate,
@@ -1695,7 +1973,14 @@ exports.oneRenting = async (req, res, next) => {
         endDate = date.addDays(endDate,30);
       }
 
-      
+      await Renting.update({
+        end_renting_date:date.format(endDate,"YYYY-MM-DD"),
+      },{
+        where:{
+          id:renting_id
+        },
+        transaction:t
+      });
     }
     await t.commit();
     return res.status(200).json({

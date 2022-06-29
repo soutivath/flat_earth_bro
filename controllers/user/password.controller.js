@@ -10,7 +10,7 @@ exports.resetPassword = async (req, res, next) => {
       //   throw createHttpError.BadRequest("old_password is required");
       // }
       if(!body.new_password){
-        throw createHttpErrorError.BadRequest("new_password is required");
+        throw createHttpError.BadRequest("new_password is required");
       }
       if(!body.phone_number){
         throw createHttpError.BadRequest("phone number is required");
