@@ -12,6 +12,7 @@ exports.getCurrentRenting = async (req,res,next)=>{
             },
             include:[{
                 model:Renting,
+                include:Room,
                 where:{
                     is_active:true
                 }
@@ -38,7 +39,7 @@ exports.getAllRenting = async (req,res,next)=>{
             where:{
                 user_id:req.user.id
             },
-            include:Renting
+            include:[{model:Renting,include:Room}]
         });
         if(typeof renting == 'undefined' || renting.length == 0){
             return res.status(404).json({message:"your data not found in our record",data:[],success:false})
