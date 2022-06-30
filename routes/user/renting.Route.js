@@ -6,6 +6,6 @@ const upload = require('multer')();
 router.get("/renting",renting.getCurrentRenting);
 router.get("/all-renting",renting.getCurrentRenting);
 router.get("/renting/:id",renting.getRentingDetail);
-
+router.get('/status-renting/:id',renting.getRentingStatus);
 
 export default router;
