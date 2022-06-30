@@ -38,6 +38,7 @@ exports.getCurrentRenting = async (req,res,next)=>{
 //get all renting by user
 exports.getAllRenting = async (req,res,next)=>{
     try{
+       
         const renting = await RentingDetail.findAll({
             where:{
                 user_id:req.user.id
@@ -220,6 +221,120 @@ exports.getRentingStatus = async (req,res,next)=>{
        
     }catch(err){
         await t.rollback();
+        next(err);
+    }
+}
+
+exports.getBillByRenting = async (req,res,next)=>{
+    try{
+        const renting_id = req.params.id;
+        const billData = await Bill.findAll({
+            where:{
+                renting_id:renting_id
+            }
+        });
+        return res.status(200).json({
+            data:billData,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
+        next(err);
+    }
+}
+exports.getBillById = async (req,res,next)=>{
+    try{
+        const bill_id = req.params.id;
+        const billData = await Bill.findOne({
+            where:{
+                id:bill_id
+            },
+            include:["bill_pay_by","bill_operate_by"]
+        });
+        return res.status(200).json({
+            data:billData,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
+        next(err);
+    }
+}
+exports.getRentingDetailByRenting = async (req,res,next)=>{
+    try{
+        const renting_id = req.params.id;
+        const rentingdetailData = await RentingDetail.findAll({
+            where:{
+                renting_id:renting_id
+            },
+
+        });
+        return res.status(200).json({
+            data:rentingdetailData,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
+        next(err);
+    }
+}
+exports.getRentingDetailDetailById = async (req,res,next)=>{
+    try{
+        const renting_detail_id = req.params.id;
+        const rentingdetaildata = await RentingDetail.findOne({
+            where:{
+                id:renting_detail_id
+            },
+            include:["renting_pay_by","renting_operate_by"]
+        });
+        return res.status(200).json({
+            data:rentingdetaildata,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
+        next(err);
+    }
+}
+exports.getTrashByRenting = async (req,res,next)=>{
+    try{
+        const renting_id = req.params.id;
+        const rentingData = await Renting.findOne({
+            where:{
+                id:renting_id
+            },
+            include:[{model:RentingDetail,include:[{model:Trash,include:["trash_operate_by","trash_pay_by"]}]}]
+        });
+        let trashArray = [];
+       
+        for(let eachData of rentingData.RentingDetails){
+            trashArray.push(eachData.Trash)
+        }
+        
+        return res.status(200).json({
+            data:trashArray,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
+        next(err);
+    }
+}
+exports.getTrashById = async (req,res,next)=>{
+    try{
+        const trashID = req.params.id;
+        const TrashData = await Trash.findOne({
+            where:{
+                id:trashID
+            },
+            include:["trash_operate_by","trash_pay_by"]
+        });
+        return res.status(200).json({
+            data:TrashData,
+            message:"get data successfully",
+            success:true
+        })
+    }catch(err){
         next(err);
     }
 }
