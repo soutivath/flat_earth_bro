@@ -140,7 +140,7 @@ exports.addUser = async (req,res,next)=>{
             phoneNumber:validatedResult.phoneNumber,
             password:"",
             image:imageProfile,
-            is_admin:0,
+            is_admin:"user",
             notification_topic:randomTopicString()
         },{
             transaction:t

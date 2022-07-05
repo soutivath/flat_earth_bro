@@ -40,9 +40,19 @@ module.exports = {
       },
       user_id:{
         type:Sequelize.INTEGER,
+        references:{
+          model:"users",
+          key:"id",
+          onDelete:"CASCADE"
+        }
       },
       staff_id:{
         type:Sequelize.INTEGER,
+        references:{
+          model:"users",
+          key:"id",
+          onDelete:"CASCADE"
+        }
       },
       createdAt: {
         allowNull: false,

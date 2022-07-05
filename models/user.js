@@ -36,6 +36,9 @@ module.exports = (sequelize, DataTypes) => {
 
      this.hasMany(models.Payment, {foreignKey: 'pay_by',as:"payBy"});
      this.hasMany(models.Payment, {foreignKey: 'operate_by',as:"operateBy"});
+
+     this.hasOne(models.Renting,{foreignKey:"user_id"});
+     this.hasOne(models.Renting,{foreignKey:"staff_id",as:"staff_renting"});
     }
   }
   User.init({

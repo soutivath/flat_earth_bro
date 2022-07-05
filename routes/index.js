@@ -13,6 +13,8 @@ import trashRouteAdmin from "./admin/trash.Route";
 import typeRouteAdmin from "./admin/type.Route";
 import userRouteAdmin from "./admin/user.Route";
 import superAdminRouteAdmin from "./admin/superadmin.Route";
+
+import reportRoute from "./admin/report.Route";
 //----------------------------------->
 
 //------------------user
@@ -24,6 +26,8 @@ import testRoute from "./test.Route";
 import resetPassword from "./user/reset_password_route";
 
 import notification from "./user/notification.Route";
+
+
 // //-------------------->
 
 import option from "./admin/setting.Route";
@@ -34,7 +38,9 @@ import mix from "./mix";
 
 import { Auth } from '../middlewares/auth.guard';
 import {isAdmin} from '../middlewares/isAdmin.guard'
-import {isSuperAdmin} from '../middlewares/isSuperAdmin.guard'
+import {isSuperAdmin} from '../middlewares/isSuperAdmin.guard';
+
+
  const app = express();
 
  
@@ -57,6 +63,8 @@ app.use("/user",[Auth],rentingRouteUser);
 app.use("/test",[Auth],testRoute);
 
 app.use('/user',[Auth],notification);
+
+app.use('/report',[Auth,isAdmin],reportRoute)
 
 
 app.use("/user",resetPassword);

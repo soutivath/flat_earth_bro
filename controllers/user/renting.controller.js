@@ -4,12 +4,15 @@ import {viewRentingWithDetail} from "../../tranformer/userViewRenting.tranformer
 import {Op} from "sequelize";
 import paidType from "../../constants/paidType";
 import createHttpError from "http-errors";
-
+import {showTransformer} from "../../tranformer/room.tranformer";
+import { promises } from "fs";
+require('dotenv').config();
+const { dirname } = require('path');
 //get where active
 exports.getCurrentRenting = async (req,res,next)=>{
     try{
       
-        const renting = await UserRenting.findAll({
+        let renting = await UserRenting.findAll({
             where:{
                 user_id:req.user.id
             },
@@ -25,6 +28,30 @@ exports.getCurrentRenting = async (req,res,next)=>{
         if (typeof renting == 'undefined' || renting.length <= 0) {
             return res.status(404).json({message:"your data not found in our record",data:[],success:false});
         }
+        renting = JSON.stringify(renting);
+        renting =JSON.parse(renting);
+        
+   
+        for(let i = 0 ;i<renting.length;i++) {
+            const appDir = dirname(require.main.filename);
+                 let dir = `${appDir}/public/images/resources/room/${renting[i].Renting.Room.images_path.toString()}`;
+                
+                 let allImages = [];
+                const files = await promises.readdir(dir);
+                 for(let file of files){
+                     allImages.push(`${process.env.APP_DOMAIN}/images/resources/room/${renting[i].Renting.Room.images_path.toString()}/${file.toString()}`)
+                 }
+                
+
+
+            renting[i].Renting.Room.allImage = allImages;
+        }
+       
+
+       
+     
+
+
         return res.status(200).json({
             data:renting,
             message:"get data successfully",
@@ -48,6 +75,7 @@ exports.getAllRenting = async (req,res,next)=>{
         if(typeof renting == 'undefined' || renting.length == 0){
             return res.status(404).json({message:"your data not found in our record",data:[],success:false})
         }
+        
         return res.status(200).json({
             data:renting,
             message:"get data successfully",

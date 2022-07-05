@@ -1,5 +1,6 @@
 
 import {sequelize,Payment,PaymentDetail,User,Renting,Room} from "../../models";
+import renting from "../../models/renting";
 
 exports.paymentRenting = async (req,res,next)=>{
     try{
@@ -52,6 +53,16 @@ exports.payments = async(req,res,next)=>{
             message:"get data successfully",
             
         });
+    }catch(err){
+        next(err);
+    }
+}
+
+
+exports.paymentInClientRoom = async (req,res,next)=>{
+    try{
+        const user_id  = req.user.id;
+        
     }catch(err){
         next(err);
     }
