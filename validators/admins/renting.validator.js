@@ -23,7 +23,7 @@ export const payRentSchema = Joi.object({
       renting_pay:Joi.boolean().required(),
       fine:Joi.number().integer()
     })
-  ).required(),
+  ),
   renting_id:Joi.number().integer(),
   //trash_pay_option: Joi.boolean().required(),
   //  "months":Joi.number().integer().required(),
