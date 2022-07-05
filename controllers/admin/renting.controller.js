@@ -40,6 +40,7 @@ import { promises } from "fs";
 exports.checkIn = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
+ 
     const validateResult = await checkInSchema.validateAsync(req.body);
     const now = validateResult.start_renting;
     let nextDate = now;
@@ -105,11 +106,11 @@ exports.checkIn = async (req, res, next) => {
     //     validateResult.renting_pay == true ? paidType.PAID : paidType.UNPAID,
     //   // trash_pay_amount: 0,
     // };
-
+let user;
     if (validateResult.renting_pay) {
     //  rentingDetailOption.renting_pay_amount = room.Type.price;
       if (validateResult.renting_pay_by) {
-        const user = await User.findByPk(validateResult.renting_pay_by);
+         user = await User.findByPk(validateResult.renting_pay_by);
         if (!user) {
           throw createHttpError(404, "user not found");
         }
@@ -561,13 +562,19 @@ exports.checkIn = async (req, res, next) => {
     );
    }
 
+
     await t.commit();
     return res.status(200).json({
       success: true,
       data: renting,
       message: "Checking in successfully",
       contract_data:{
-
+        staff_name:req.user.name,
+        staff_personal_card_no:req.user.personal_card_no,
+        user_name:user.name,
+        user_personal_card:user.personal_card_no,
+        people_count:validateResult.users_renting.length,
+        contract_date:date.format(validateResult.start_renting,"YYYY-MM-DD"),
       }
     });
   } catch (err) {
