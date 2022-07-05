@@ -1919,7 +1919,7 @@ exports.getAllRenting = async (req, res, next) => {
            let allImages = [];
           const files = await promises.readdir(dir);
            for(let file of files){
-               allImages.push(`${process.env.APP_DOMAIN}/images/resources/room/${allRentingData[i].Renting.Room.images_path.toString()}/${file.toString()}`)
+               allImages.push(`${process.env.APP_DOMAIN}/images/resources/room/${allRentingData[i].Room.images_path.toString()}/${file.toString()}`)
            }
           
 
