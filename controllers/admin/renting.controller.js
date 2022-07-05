@@ -33,6 +33,10 @@ import payment_detail from "../../constants/payment_detail";
 import { format } from "date-fns";
 import rentingdetail from "../../models/rentingdetail";
 
+require('dotenv').config();
+const { dirname } = require('path');
+import { promises } from "fs";
+
 exports.checkIn = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
@@ -562,6 +566,9 @@ exports.checkIn = async (req, res, next) => {
       success: true,
       data: renting,
       message: "Checking in successfully",
+      contract_data:{
+
+      }
     });
   } catch (err) {
     await t.rollback();
@@ -1903,8 +1910,22 @@ exports.getAllRenting = async (req, res, next) => {
       where: option,
       include: [Bill, { model: Room, include: Type }],
     });
-    // allRentingData = JSON.stringify(allRentingData);
-    // allRentingData = JSON.parse(allRentingData);
+    allRentingData = JSON.stringify(allRentingData);
+    allRentingData = JSON.parse(allRentingData);
+    for(let i = 0 ;i<allRentingData.length;i++) {
+      const appDir = dirname(require.main.filename);
+           let dir = `${appDir}/public/images/resources/room/${allRentingData[i].Room.images_path.toString()}`;
+          
+           let allImages = [];
+          const files = await promises.readdir(dir);
+           for(let file of files){
+               allImages.push(`${process.env.APP_DOMAIN}/images/resources/room/${allRentingData[i].Renting.Room.images_path.toString()}/${file.toString()}`)
+           }
+          
+
+
+           allRentingData[i].Room.allImage = allImages;
+  }
     // let billTranform = bills(allRentingData.Bills);
     // allRentingData.Bills = billTranform;
     return res.status(200).json({
