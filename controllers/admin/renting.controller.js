@@ -648,6 +648,7 @@ exports.payRent = async (req, res, next) => {
     });
     const allTrashPrice = trash.value;
 
+    if(validateResult.renting_pay){
     for (let eachRenitngDetail of validateResult.renting_pay) {
       const renting_detail = await RentingDetail.findOne({
         where: {
@@ -871,6 +872,7 @@ exports.payRent = async (req, res, next) => {
         );
       }
     }
+  }
 
     if (months != 0) {
       if (checkRenting.active == 0) {

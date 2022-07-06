@@ -30,7 +30,7 @@ exports.rentingReport = async (req, res, next) => {
         isActive.is_active = 0;
       }
     }
-    const rentingData = await Renting.findOne({
+    const rentingData = await Renting.findAll({
       where: isActive,
       include: [User,"staff"],
     });
