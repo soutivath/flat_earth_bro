@@ -53,15 +53,21 @@ exports.billReport = async (req, res, next) => {
     const isPaid = req.query.isPaid;
   
  
+    console.log(".......................................................");
     const billData = await Bill.findAll({
       where: {
         is_pay: isPaid,
         bill_type: billType,
-        [Op.or]: [{
-          createdAt: {
-              [Op.between]: [from, to]
-          }
-      },]
+       
+          createdAt:{
+            [Op.gte]:from,
+            [Op.lte]:to
+          },
+          
+          // createdAt: {
+          //     [Op.between]: [from, to]
+          // }
+     
       },
       include: [
         "bill_pay_by",
@@ -72,7 +78,7 @@ exports.billReport = async (req, res, next) => {
         },
       ],
     });
-
+    console.log(".......................................................");
     return res.status(200).json({
       data: billData,
       message: "get data successfully",
