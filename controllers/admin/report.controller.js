@@ -61,11 +61,7 @@ exports.billReport = async (req, res, next) => {
           createdAt: {
               [Op.between]: [from, to]
           }
-      }, {
-        createdAt: {
-              [Op.between]: [from, to]
-          }
-      }]
+      },]
       },
       include: [
         "bill_pay_by",
