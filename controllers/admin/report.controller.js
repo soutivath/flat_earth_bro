@@ -164,6 +164,7 @@ exports.rentingPayReport = async (req,res,next)=>{
           }]
           },
           include: [
+            Room,
             "renting_pay_by",
             "renting_operate_by",
             {
