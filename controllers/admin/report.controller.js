@@ -169,7 +169,7 @@ exports.rentingPayReport = async (req,res,next)=>{
             "renting_operate_by",
             {
               model: Renting,
-              include:Room
+              include:[Room,User]
              
             },
           ],
