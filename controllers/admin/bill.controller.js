@@ -131,7 +131,7 @@ exports.payBill = async (req, res, next) => {
  
 
 
-      await PaymentDetail.create({
+   await PaymentDetail.create({
         name:name.LA +" ວັນທີ "+checkBill.createdAt,
         price:checkBill.price,
         type:name.EN,
@@ -153,10 +153,18 @@ exports.payBill = async (req, res, next) => {
     });
 
     await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:payment.id
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
     return res.status(200).json({
       data: [],
       message: "Bill has been paid successfully",
       success: true,
+      payment_information:responsePayment
     });
   } catch (err) {
     await t.rollback();

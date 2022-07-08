@@ -137,9 +137,17 @@ exports.payTrash = async (req, res, next) => {
   });
   
     await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:payment.id
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
     return res.status(200).json({
       message: "Trash pay successfully",
       success: true,
+      payment_information:responsePayment
     });
 
     /**

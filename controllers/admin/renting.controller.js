@@ -564,10 +564,18 @@ let user;
 
 
     await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:newPaymentData.id
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
     return res.status(200).json({
       success: true,
       data: renting,
       message: "Checking in successfully",
+      payment_information:responsePayment,
       contract_data:{
         staff_name:req.user.name,
         staff_personal_card_no:req.user.personal_card_no,
@@ -1036,8 +1044,17 @@ exports.payRent = async (req, res, next) => {
     );
 
     await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:payment_no
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
+
     return res.status(200).json({
       message: "pay rent successfully",
+      payment_information:responsePayment
     });
   } catch (err) {
     await t.rollback();
@@ -1787,10 +1804,18 @@ exports.checkOut = async (req, res, next) => {
       }
     );
     await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:checkout_payment.id
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
     return res.status(200).json({
       data: renting,
       message: "Checkout comeplete",
       success: true,
+      payment_information:responsePayment
     });
   } catch (err) {
     await t.rollback();
