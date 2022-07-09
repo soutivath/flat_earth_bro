@@ -5,11 +5,11 @@ import renting from "../../models/renting";
 exports.paymentRenting = async (req,res,next)=>{
     try{
         const renting_id = req.params.id;
-        const data = await Renting.findOne({
+        const data = await Payment.findAll({
             where:{
-                id:renting_id
+                renting_id:renting_id
             },
-            include:[{model:Payment,include:["payBy","operateBy",PaymentDetail]}]
+            include:["payBy","operateBy",PaymentDetail]
         });
         return res.status(200).json({
             message:"get data successfully",
