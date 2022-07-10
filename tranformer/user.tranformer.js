@@ -12,6 +12,8 @@ exports.userTranformer = (data)=>{
         let oneUserData= {
             id: user.id,
             name: user.name,
+            surname:user.surname,
+            dob:user.dob,
             phoneNumber: user.phoneNumber,
             image: image,
             is_admin: user.is_admin,

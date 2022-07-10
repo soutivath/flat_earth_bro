@@ -127,6 +127,8 @@ exports.addAdmin = async (req, res, next) => {
     const newAdmin = await User.create(
       {
         name: validatedResult.name,
+        surname: validatedResult.surname,
+        dob: validatedResult.dob,
         phoneNumber: validatedResult.phoneNumber,
         image: imageProfile,
         is_admin: validatedResult.is_admin,

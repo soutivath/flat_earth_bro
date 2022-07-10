@@ -19,6 +19,8 @@ module.exports = {
      let admin = await queryInterface.bulkInsert('users',[{
     
       name:"just normal Admin",
+      surname:"surname normal admin",
+      dob:"2000-12-20",
       phoneNumber:"+8562022222222",
       image:"default_profile.png",
       is_admin:"admin",

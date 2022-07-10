@@ -30,6 +30,8 @@ module.exports = {
 let user3 = await queryInterface.bulkInsert('users',[{
     
   name:"user 1",
+  surname:"surname user1",
+  dob:"2000-12-20",
   phoneNumber:"+8562033333333",
   image:"default_profile.png",
   is_admin:"user",
@@ -54,6 +56,8 @@ updatedAt: new Date()
 let user4 = await queryInterface.bulkInsert('users',[{
     
   name:"just user 2",
+  surname:"surname user2",
+  dob:"2000-12-20",
   phoneNumber:"+8562044444444",
   image:"default_profile.png",
   is_admin:"user",
@@ -76,8 +80,9 @@ updatedAt: new Date()
 
 //user 3
 let user5 = await queryInterface.bulkInsert('users',[{
-    
   name:"just normal user 3",
+  surname:"surname user3",
+  dob:"2000-12-20",
   phoneNumber:"+8562055555555",
   image:"default_profile.png",
   is_admin:"user",
@@ -102,6 +107,8 @@ updatedAt: new Date()
 let user6 = await queryInterface.bulkInsert('users',[{
     
   name:"just normal user 6",
+  surname:"surname user 6",
+  dob:"2000-12-20",
   phoneNumber:"+8562066666666",
   image:"default_profile.png",
   is_admin:"user",

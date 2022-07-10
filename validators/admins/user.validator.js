@@ -13,6 +13,8 @@ export const postEditAdminSchema = Joi.object({
 
 export const addUserSchema = Joi.object({
     "name":Joi.string().required(),
+    "surname":Joi.string().required(),
+    "dob":Joi.date().required(),
   //  "password":Joi.string().required(),
     "phoneNumber":Joi.number().integer().required(),
     "is_admin":Joi.string().valid(...Object.values(["user","admin","superadmin"])).required(),
@@ -20,6 +22,7 @@ export const addUserSchema = Joi.object({
 });
 export const adminAddUserSchema = Joi.object({
     "name":Joi.string().required(),
-  
+    "surname":Joi.string().required(),
+    "dob":Joi.date().required(),
     "phoneNumber":Joi.number().integer().required(),
 });

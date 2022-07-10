@@ -137,6 +137,8 @@ exports.addUser = async (req,res,next)=>{
         const validatedResult = await adminAddUserSchema.validateAsync(req.body);
         const newUser = await User.create({
             name:validatedResult.name,
+            surname:validatedResult.surname,
+            dob:validatedResult.dob,
             phoneNumber:validatedResult.phoneNumber,
             password:"",
             image:imageProfile,
