@@ -1047,7 +1047,7 @@ exports.payRent = async (req, res, next) => {
 
     let responsePayment = await Payment.findOne({
       where:{
-        id:payment_no
+        id:payment.id
       },
       include:[PaymentDetail,"payBy","operateBy"]
     });
