@@ -57,7 +57,7 @@ app.use("/admin",[Auth,isAdmin],superAdminRouteAdmin);
 
 app.use('/superadmin',[Auth,isSuperAdmin],option);
 
-app.use("/user",[Auth],authRouteUser);
+app.use("/user",authRouteUser);
 app.use("/user",[Auth],profileRouteUser);
 app.use("/user",[Auth],rentingRouteUser);
 app.use("/test",[Auth],testRoute);
