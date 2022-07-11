@@ -315,7 +315,7 @@ let user;
               is_trash_pay: paidType.PAID,
               is_renting_pay: paidType.PAID,
               renting_pay_amount: roomPrice,
-              proof_of_payment: newPaymentDataNo,
+              proof_of_payment: newPaymentData.id,
               pay_by: validateResult.renting_pay_by,
               operate_by: req.user.id,
               fine: 0,
@@ -1042,15 +1042,16 @@ exports.payRent = async (req, res, next) => {
         transaction: t,
       }
     );
-
-    await t.commit();
-
     let responsePayment = await Payment.findOne({
       where:{
         id:payment.id
       },
       include:[PaymentDetail,"payBy","operateBy"]
     });
+
+    await t.commit();
+
+    
 
     return res.status(200).json({
       message: "pay rent successfully",
