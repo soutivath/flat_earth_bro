@@ -107,13 +107,17 @@ exports.checkIn = async (req, res, next) => {
     //   // trash_pay_amount: 0,
     // };
 let user;
+user = await User.findByPk(validateResult.renting_pay_by);
+if (!user) {
+  throw createHttpError(404, "user not found");
+}
     if (validateResult.renting_pay) {
     //  rentingDetailOption.renting_pay_amount = room.Type.price;
       if (validateResult.renting_pay_by) {
-         user = await User.findByPk(validateResult.renting_pay_by);
-        if (!user) {
-          throw createHttpError(404, "user not found");
-        }
+        //  user = await User.findByPk(validateResult.renting_pay_by);
+        // if (!user) {
+        //   throw createHttpError(404, "user not found");
+        // }
      //   rentingDetailOption.renting_pay_by = validateResult.renting_pay_by;
       } else {
         throw createHttpError(422, "Please provide a user id");
@@ -547,7 +551,10 @@ let user;
       }
     );
 
+    
+
    if(newPaymentData!=null){
+   
     await Payment.update(
       {
         payment_no: newPaymentDataNo,
@@ -560,31 +567,62 @@ let user;
         transaction: t,
       }
     );
+   
    }
+   
 
-
-    await t.commit();
-
-    let responsePayment = await Payment.findOne({
+   await t.commit();
+  
+  if(newPaymentData!=null){
+    let paymentDataForResponse = await Payment.findOne({
       where:{
         id:newPaymentData.id
       },
       include:[PaymentDetail,"payBy","operateBy"]
     });
+
     return res.status(200).json({
       success: true,
       data: renting,
       message: "Checking in successfully",
-      payment_information:responsePayment,
+      payment_information:paymentDataForResponse,
       contract_data:{
-        staff_name:req.user.name,
-        staff_personal_card_no:req.user.personal_card_no,
-        user_name:user.name,
-        user_personal_card:user.personal_card_no,
-        people_count:validateResult.users_renting.length,
-        contract_date:date.format(validateResult.start_renting,"YYYY-MM-DD"),
+        staff_name : req.user.name,
+        staff_surname: req.user.surname,
+        staff_personal_card_no : req.user.personal_card_no,
+        user_name : user.name,
+        user_surname : user.surname,
+        user_personal_card : user.personal_card_no,
+        people_count : validateResult.users_renting.length,
+        contract_date : date.format(validateResult.start_renting,"YYYY-MM-DD")
       }
     });
+   
+  }
+  else{
+    
+
+
+    return res.status(200).json({
+      success: true,
+      data: renting,
+      message: "Checking in successfully",
+      payment_information:null,
+      contract_data:{
+        staff_name : req.user.name,
+        staff_surname: req.user.surname,
+        staff_personal_card_no : req.user.personal_card_no,
+        user_name : user.name,
+        user_surname : user.surname,
+        user_personal_card : user.personal_card_no,
+        people_count : validateResult.users_renting.length,
+        contract_date : date.format(validateResult.start_renting,"YYYY-MM-DD")
+      }
+    });
+
+  }
+ 
+ 
   } catch (err) {
     await t.rollback();
 
