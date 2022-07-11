@@ -2,6 +2,8 @@ import Joi from "joi";
 
 export const postEditAdminSchema = Joi.object({
     "name":Joi.string().required(),
+    "surname":Joi.string().required(),
+    "dob":Joi.date().required(),
     "phoneNumber":Joi.string().length(14).required(),
     "is_admin":Joi.string().valid(...Object.values(["user","admin","superadmin"])).required(),
     "personal_card_no":Joi.string().required()
