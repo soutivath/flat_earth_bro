@@ -248,7 +248,7 @@ exports.rentingNotPayReport = async (req,res,next)=>{
         
       }
 
-      if(trashCount!=0 || rentingDetailCount!=0 || billCount!=0){
+      if(trashCount!=0 || rentingDetailCount!=0 || billWaterCount!=0 || billElectricCount!=0){
         let oneObject = {
           id:activeRenting[i].id,
           renting_by:activeRenting[i].User.name,
