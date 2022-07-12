@@ -124,7 +124,7 @@ exports.trashReport = async (req,res,next)=>{
         +"LEFT JOIN rooms ON rentings.room_id = rooms.id "
         +"LEFT JOIN users AS rentByUser ON rentings.user_id = rentByUser.id "
         +"LEFT JOIN users AS operateByStaff ON rentings.staff_id = operateByStaff.id "
-        +"LEFT JOIN payments ON trashes.proof_of_payment = payments.id"
+        +"LEFT JOIN payments ON trashes.proof_of_payment = payments.id "
         +"WHERE trashes.is_trash_pay = ? AND (rentingdetails.start_date BETWEEN ? AND ? OR `rentingdetails`.`end_date` BETWEEN ? AND ?)",{
           replacements:[isPaid,from,to,from,to]
         });
