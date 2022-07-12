@@ -118,12 +118,13 @@ exports.trashReport = async (req,res,next)=>{
         //   ],
         // });
 
-        const [results, metadata] = await sequelize.query("SELECT trashes.id AS trash_id,trashes.is_trash_pay,trashes.trash_pay_amount,trashes.rentingdetail_id,rentingdetails.start_date,rentingdetails.end_date,rentByUser.id as user_id,rentByUser.name AS user_name,rentByUser.phoneNumber,operateByStaff.id AS staff_id,operateByStaff.name AS staff_name,rooms.id AS room_id,rooms.name AS room_name FROM trashes "
+        const [results, metadata] = await sequelize.query("SELECT trashes.id AS trash_id,trashes.is_trash_pay,trashes.trash_pay_amount,trashes.rentingdetail_id,rentingdetails.start_date,rentingdetails.end_date,rentByUser.id as user_id,rentByUser.name AS user_name,rentByUser.phoneNumber,operateByStaff.id AS staff_id,operateByStaff.name AS staff_name,rooms.id AS room_id,rooms.name AS room_name ,payments.proof_of_payment FROM trashes "
         +"LEFT JOIN rentingdetails ON trashes.rentingdetail_id = rentingdetails.id "
         +"LEFT JOIN rentings ON rentingdetails.renting_id = rentings.id "
         +"LEFT JOIN rooms ON rentings.room_id = rooms.id "
         +"LEFT JOIN users AS rentByUser ON rentings.user_id = rentByUser.id "
         +"LEFT JOIN users AS operateByStaff ON rentings.staff_id = operateByStaff.id "
+        +"LEFT JOIN payments ON trashes.proof_of_payment = payments.id"
         +"WHERE trashes.is_trash_pay = ? AND (rentingdetails.start_date BETWEEN ? AND ? OR `rentingdetails`.`end_date` BETWEEN ? AND ?)",{
           replacements:[isPaid,from,to,from,to]
         });
