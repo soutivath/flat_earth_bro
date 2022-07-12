@@ -27,7 +27,8 @@ exports.onePayment = async(req,res,next)=>{
         const  data = await PaymentDetail.findOne({
             where:{
                 id:payment_detail_id
-            }
+            },
+            include:[Payment]
         });
         return res.status(200).json({
             message:"get data successfully",
