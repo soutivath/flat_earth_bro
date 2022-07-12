@@ -7,5 +7,6 @@ router.get("/currentProfile",authProfile.getCurrentProfile);
 router.get("/onePayment/:id",paymentController.onePayment);
 router.get("/payments",paymentController.payments);
 router.get("/paymentRenting/:id",paymentController.paymentRenting);
+router.get("/oneHeaderPayment/:id",paymentController.oneHeaderPayment);
 
 export default router;

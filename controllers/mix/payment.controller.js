@@ -39,6 +39,27 @@ exports.onePayment = async(req,res,next)=>{
         next(err);
     }
 }
+exports.oneHeaderPayment = async(req,res,next)=>{
+    try{
+        const payment_id = req.params.id;
+        const  data = await Payment.findOne({
+            where:{
+                id:payment_id
+            },
+            include:[{
+                model:Renting,
+                include:Room
+            },"payBy","operateBy",PaymentDetail]
+        });
+        return res.status(200).json({
+            message:"get data successfully",
+            success:true,
+            data:data
+        });
+    }catch(err){
+        next(err);
+    }
+}
 
 
 exports.payments = async(req,res,next)=>{
