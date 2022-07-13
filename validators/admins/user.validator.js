@@ -18,7 +18,7 @@ export const addUserSchema = Joi.object({
     "surname":Joi.string().required(),
     "dob":Joi.date().required(),
   //  "password":Joi.string().required(),
-    "phoneNumber":Joi.number().integer().required(),
+    "phoneNumber":Joi.string().required(),
     "is_admin":Joi.string().valid(...Object.values(["user","admin","superadmin"])).required(),
     "personal_card_no":Joi.string().required()
 });
@@ -26,5 +26,5 @@ export const adminAddUserSchema = Joi.object({
     "name":Joi.string().required(),
     "surname":Joi.string().required(),
     "dob":Joi.date().required(),
-    "phoneNumber":Joi.number().integer().required(),
+    "phoneNumber":Joi.string().required(),
 });
