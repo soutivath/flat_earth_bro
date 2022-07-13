@@ -8,4 +8,6 @@ router.get("/notification",noticationController.getCurrentNotification);
 router.get('/global-notification',noticationController.getGlobalCurrentNotification);
 router.post('/notification-setting',upload.any(),noticationController.changeNotification);
 
+router.get('/getOneNotification/{id}',noticationController.getOneNotification);
+router.get('/getOneGlobalNotification/{id}',noticationController.getOneGlobalNotification);
 export default router;

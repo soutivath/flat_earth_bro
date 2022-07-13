@@ -5,6 +5,44 @@ import notificationUpdateSchema from "../../validators/users/notificationUpdate.
 
 import * as admin from "firebase-admin";
 import createHttpError from "http-errors";
+
+
+exports.getOneNotification = async (req,res,next)=>{
+    try{
+        const notificationData = await Notification.findOne({
+            where:{
+                id:req.params.id
+            }
+        });
+
+        return res.status(200).json({
+            data:notificationData,
+            message:"get data successfully",
+            success:true
+        });
+    }catch(err){
+        next(err);
+    }
+}
+exports.getOneGlobalNotification = async (req,res,next)=>{
+    try{
+        const notificationData = await GlobalNotification.findOne({
+            where:{
+                id:req.params.id
+            }
+        });
+
+        return res.status(200).json({
+            data:notificationData,
+            message:"get data successfully",
+            success:true
+        });
+    }catch(err){
+        next(err);
+    }
+}
+
+
 exports.getCurrentNotification = async (req,res,next) => {
     try{
         const notificationData = await Notification.findAll({
