@@ -107,6 +107,8 @@ exports.sendGlobalNotification = async (req, res, next) => {
       title: validationResult.title,
       message: validationResult.message,
       detail: validationResult.detail,
+    },{
+      transaction:t
     });
 
     const message = {
@@ -129,7 +131,7 @@ exports.sendGlobalNotification = async (req, res, next) => {
         console.log("Error sending message:", error);
         throw createHttpError.InternalServerError("Can't send message");
       });
-
+      await t.commit();
     return res.status(200).json({
       message: "send notification successfully",
       success: true,
