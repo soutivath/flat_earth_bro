@@ -1177,20 +1177,21 @@ exports.checkOut = async (req, res, next) => {
       },
     });
     //  const allTrashPrice = trash.value;
+ 
 
     let aToDeleteRentingDetail;
-    if (
-      date
-        .subtract(
-          date.parse(nowDate, "YYYY-MM-DD"),
-          date.parse(twoLastedRecord[0].end_date, "YYYY-MM-DD")
-        )
-        .toDays() > 30 &&
-      validationResult.bypass_checkout == true
-    ) {
-      throw createHttpError(400, "Please pay renting before checking out");
-    }
-   
+  //   if (
+  //     date
+  //       .subtract(
+  //         date.parse(nowDate, "YYYY-MM-DD"),
+  //         date.parse(twoLastedRecord[0].start_date, "YYYY-MM-DD")
+  //       )
+  //       .toDays() > 30 &&
+  //     validationResult.bypass_checkout == false
+  //   ) {
+  //     throw createHttpError(400, "Please pay renting before checking out");
+  //   }
+  //  throw createHttpError(400,"nice");
 
 
    if(!twoLastedRecord[1]){
@@ -1843,19 +1844,30 @@ exports.checkOut = async (req, res, next) => {
       }
     );
     await t.commit();
+    if(checkout_payment!=null){
+      let responsePayment = await Payment.findOne({
+        where:{
+          id:checkout_payment.id
+        },
+        include:[PaymentDetail,"payBy","operateBy"]
+      });
+      return res.status(200).json({
+        data: renting,
+        message: "Checkout comeplete",
+        success: true,
+        payment_information:responsePayment
+      });
+    }
+    else{
+      return res.status(200).json({
+        data: renting,
+        message: "Checkout comeplete",
+        success: true,
+        payment_information:null
+      });
+    }
 
-    let responsePayment = await Payment.findOne({
-      where:{
-        id:checkout_payment.id
-      },
-      include:[PaymentDetail,"payBy","operateBy"]
-    });
-    return res.status(200).json({
-      data: renting,
-      message: "Checkout comeplete",
-      success: true,
-      payment_information:responsePayment
-    });
+    
   } catch (err) {
     await t.rollback();
     next(err);

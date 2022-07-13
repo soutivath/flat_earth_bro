@@ -1,6 +1,6 @@
 
-import {sequelize,Payment,PaymentDetail,User,Renting,Room} from "../../models";
-import renting from "../../models/renting";
+import {sequelize,Payment,PaymentDetail,User,Renting,Room,UserRenting} from "../../models";
+import {Op} from "sequelize";
 
 exports.paymentRenting = async (req,res,next)=>{
     try{
@@ -84,6 +84,73 @@ exports.payments = async(req,res,next)=>{
 exports.paymentInClientRoom = async (req,res,next)=>{
     try{
         const user_id  = req.user.id;
+        const active = req.query.active;
+      
+        let userRenting;
+        if(active=="true"){
+
+        
+         userRenting = await UserRenting.findAll({
+            where:{
+                user_id:user_id
+            },
+            include:[{
+                model:Renting,
+                where:{
+                    is_active:true
+                }
+            }]
+        });
+    }else if(active=="false"){
+        userRenting = await UserRenting.findAll({
+            where:{
+                user_id:user_id
+            },
+            include:[{
+                model:Renting,
+                where:{
+                    is_active:false
+                }
+            }]
+        });
+    }else{
+        userRenting = await UserRenting.findAll({
+            where:{
+                user_id:user_id
+            },
+            include:[{
+                model:Renting,
+                where:{
+                    is_active:true
+                }
+            }]
+        });
+    }
+    let rentingId = [];
+
+    for(let eachRenting of userRenting){
+        rentingId.push(eachRenting.Renting.id);
+    }
+
+
+    const paymentData = await Payment.findAll({
+        where:{
+            renting_id:{
+                [Op.in]:rentingId
+            }
+        },
+        include:[{
+            model:Renting,
+            include:Room
+        },"payBy","operateBy",PaymentDetail]
+    });
+
+    return res.status(200).json({
+        data:paymentData,
+        success:true,
+        message:"get data successfully"
+    });
+
         
     }catch(err){
         next(err);
