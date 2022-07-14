@@ -200,6 +200,8 @@ exports.rentingNotPayReport = async (req,res,next)=>{
     activeRenting = JSON.stringify(activeRenting);
     activeRenting = JSON.parse(activeRenting);
 
+    let nowDateString = date.format(new Date(),"YYYY-MM-DD");
+
     let reportData = [];
 
     for(let i=0;i<activeRenting.length;i++){
@@ -223,12 +225,12 @@ exports.rentingNotPayReport = async (req,res,next)=>{
         }
       });
       
-
+      
       const [results, metadata] = await sequelize.query(
         "SELECT rentingdetails.id AS rentingdetail_id,rentingdetails.is_renting_pay,trashes.id AS trash_id,trashes.is_trash_pay,rentingdetails.start_date,rentingdetails.end_date"
-        +" FROM rentingdetails LEFT JOIN trashes ON rentingdetails.id = trashes.rentingdetail_id WHERE rentingdetails.renting_id = ? AND (trashes.is_trash_pay = 'unpaid' OR rentingdetails.is_renting_pay = 'unpaid' )"
+        +" FROM rentingdetails LEFT JOIN trashes ON rentingdetails.id = trashes.rentingdetail_id WHERE rentingdetails.renting_id = ? AND (trashes.is_trash_pay = 'unpaid' OR rentingdetails.is_renting_pay = 'unpaid' ) AND ? >= rentingdetails.start_date"
       ,{
-        replacements:[activeRenting[i].id]
+        replacements:[activeRenting[i].id,nowDateString]
       });
    
       for(let eachResult of results){
