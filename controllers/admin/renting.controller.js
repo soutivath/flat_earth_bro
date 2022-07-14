@@ -574,6 +574,11 @@ if (!user) {
    await t.commit();
 
 
+   const superAdmin = await User.findOne({
+    where:{
+      is_admin:"superadmin"
+    }
+   });
   
   if(newPaymentData!=null){
     let paymentDataForResponse = await Payment.findOne({
@@ -589,6 +594,7 @@ if (!user) {
       message: "Checking in successfully",
       payment_information:paymentDataForResponse,
       contract_data:{
+        superadmin:superAdmin,
         staff_name : req.user.name,
         staff_surname: req.user.surname,
         staff_personal_card_no : req.user.personal_card_no,
@@ -606,6 +612,7 @@ if (!user) {
 
 
     return res.status(200).json({
+      superadmin:superAdmin,
       success: true,
       data: renting,
       message: "Checking in successfully",
@@ -1847,6 +1854,11 @@ exports.checkOut = async (req, res, next) => {
       }
     );
     await t.commit();
+    const superAdmin = await User.findOne({
+      where:{
+        is_admin:"superadmin"
+      }
+     });
     if(checkout_payment!=null){
       let responsePayment = await Payment.findOne({
         where:{
@@ -1855,6 +1867,7 @@ exports.checkOut = async (req, res, next) => {
         include:[PaymentDetail,"payBy","operateBy"]
       });
       return res.status(200).json({
+        superAdmin:superAdmin,
         data: renting,
         message: "Checkout comeplete",
         success: true,
@@ -1863,6 +1876,7 @@ exports.checkOut = async (req, res, next) => {
     }
     else{
       return res.status(200).json({
+        superAdmin:superAdmin,
         data: renting,
         message: "Checkout comeplete",
         success: true,
