@@ -1089,16 +1089,16 @@ exports.payRent = async (req, res, next) => {
         transaction: t,
       }
     );
+
+
+    await t.commit();
+
     let responsePayment = await Payment.findOne({
       where:{
         id:payment.id
       },
       include:[PaymentDetail,"payBy","operateBy"]
     });
-
-    await t.commit();
-
-    
 
     return res.status(200).json({
       message: "pay rent successfully",
