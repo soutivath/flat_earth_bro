@@ -2011,7 +2011,7 @@ exports.getAllRenting = async (req, res, next) => {
 
     let allRentingData = await Renting.findAll({
       where: option,
-      include: [Bill, { model: Room, include: Type }],
+      include: [Bill, { model: Room, include: Type },UserRenting],
     });
     allRentingData = JSON.stringify(allRentingData);
     allRentingData = JSON.parse(allRentingData);
