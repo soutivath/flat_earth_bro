@@ -572,6 +572,8 @@ if (!user) {
    
 
    await t.commit();
+
+
   
   if(newPaymentData!=null){
     let paymentDataForResponse = await Payment.findOne({
@@ -595,7 +597,7 @@ if (!user) {
         user_personal_card : user.personal_card_no,
         people_count : validateResult.users_renting.length,
         contract_date : date.format(validateResult.start_renting,"YYYY-MM-DD")
-      }
+      },
     });
    
   }
@@ -1158,6 +1160,7 @@ exports.checkOut = async (req, res, next) => {
       where: {
         id: validationResult.renting_id,
       },
+      include:[User,'staff']
     });
     if (!renting) throw createHttpError.NotFound("Renting not found");
     const twoLastedRecord = await RentingDetail.findAll({
@@ -1919,6 +1922,7 @@ exports.removePeople = async (req, res, next) => {
       success: true,
       message: "Remove people successfully",
       data: checkRecordIsExist,
+      contract_data:renting
     });
   } catch (err) {
     await t.rollback();
