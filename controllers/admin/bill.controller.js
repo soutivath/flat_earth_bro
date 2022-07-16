@@ -358,7 +358,7 @@ exports.getOne = async (req, res, next) => {
       where: {
         id:billID,
       },
-      include: ["bill_pay_by","bill_operate_by", Renting],
+      include: ["bill_pay_by","bill_operate_by", {model:Renting,include:Room}],
     });
   
     if (billData!=null) {
