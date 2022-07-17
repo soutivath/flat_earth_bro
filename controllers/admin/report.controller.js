@@ -233,22 +233,29 @@ exports.rentingNotPayReport = async (req,res,next)=>{
         replacements:[activeRenting[i].id]
       });
    
+      // return res.status(200).json({
+      //   data:results
+      // });
+  
       for(let eachResult of results){
+     
         if(date
           .subtract(
            new Date(),
             date.parse(eachResult.end_date, "YYYY-MM-DD")
           )
-          .toDays() <= 0){
+          .toDays() >= 0){
             if(eachResult.is_renting_pay=='unpaid'){
+            
               rentingDetailCount++;
             }
     
             if(eachResult.is_trash_pay=='unpaid'){
+            
               trashCount++;
             }
           }
-        
+    
       }
 
       if(trashCount!=0 || rentingDetailCount!=0 || billWaterCount!=0 || billElectricCount!=0){
