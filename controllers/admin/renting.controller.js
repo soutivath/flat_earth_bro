@@ -612,12 +612,13 @@ if (!user) {
 
 
     return res.status(200).json({
-      superadmin:superAdmin,
+     
       success: true,
       data: renting,
       message: "Checking in successfully",
       payment_information:null,
       contract_data:{
+        superadmin:superAdmin,
         staff_name : req.user.name,
         staff_surname: req.user.surname,
         staff_personal_card_no : req.user.personal_card_no,
