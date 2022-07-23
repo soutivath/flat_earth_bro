@@ -17,6 +17,8 @@ import {
 
 import payment_detail_enum from "../../constants/payment_detail";
 
+
+
 import date from "date-and-time";
 import { checkActiveRoom, checkExistingRenting } from "../helpers/rooms.helper";
 import { getTrashPrice } from "../../constants/price";
@@ -25,6 +27,7 @@ import {
   payRentSchema,
   checkOutSchema,
   removePeopleSchema,
+  multipay
 } from "../../validators/admins/renting.validator";
 import { Op } from "sequelize";
 import { Bills } from "../../tranformer/bill.tranformer";
@@ -2270,4 +2273,347 @@ exports.addProofOfPayment = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
+}
+
+exports.payMultiBill = async (req,res,next)=>{
+
+  const t = await sequelize.transaction();
+
+  try {
+    let totalPrice = 0;
+    const validatedResult = await multipay.validateAsync(req.body);
+
+    let checkUser = await User.findOne({
+      where: {
+        id: validatedResult.pay_by,
+      },
+    });
+    if (!checkUser) {
+      throw createHttpError(404, "User not found");
+    }
+
+    const now  = date.format(new Date(),"YYYY-MM-DD");
+  
+    let payment = await Payment.create({
+      pay_by:validatedResult.pay_by,
+      renting_id:validatedResult.renting_id,
+      operate_by:req.user.id,
+      pay_date:now
+    },{
+      transaction:t
+    });
+
+    let payment_no = payment.id.toString().padStart(10, "0");
+   
+    if(validatedResult.bill_pay_id){
+    //start bill
+    for(let aBill of validatedResult.bill_pay_id){
+      let checkBill = await Bill.findOne({
+        where:{
+          id:aBill
+        },plain:true
+      });
+      if (!checkBill) {
+        throw createHttpError(404, "Bill not found");
+      }
+      if (checkBill.is_pay==paidType.PAID) {
+        throw createHttpError(400, "Some bills is already paid");
+      }
+
+      await Bill.update(
+        {
+          is_pay: paidType.PAID,
+          proof_of_payment:payment.id,
+          pay_by:validatedResult.pay_by,
+          operate_by: req.user.id
+        },
+        {
+          where: {
+            id: aBill,
+          },
+          transaction: t,
+        }
+      );
+      
+      totalPrice += parseInt(checkBill.price);
+      let name = checkBill.bill_type=="water"?payment_detail_enum.WATER:payment_detail_enum.ELECTRIC;
+    
+
+ 
+
+
+   await PaymentDetail.create({
+        name:name.LA +" ວັນທີ "+checkBill.createdAt,
+        price:checkBill.price,
+        type:name.EN,
+        payment_id:payment.id,
+      },{
+        transaction: t,
+      });
+    }
+  }
+
+    // end bill
+    /////////////
+    ///////////////
+    ///////////////
+    /////////////
+    ////////////
+    /////////////////
+    ////////////
+    //////////////
+    ///////////////
+    ///////////////
+
+    //start trash
+    const trash_price = await Setting.findOne({
+      where:{
+        name:"trash_price"
+      }
+  });
+  if(validatedResult.trash_pay_id){
+   for(let eachTrashPay of validatedResult.trash_pay_id){
+    const trash_detail = await Trash.findOne(
+    {
+      where:{
+        id:eachTrashPay
+      },
+      include:"rentingdetail"
+    }
+    );
+   
+    if (!trash_detail) createHttpError.NotFound("Trash not found");
+
+    if (trash_detail.is_trash_pay==paidType.PAID) {
+      throw createHttpError(400, "This record already paid");
+    }
+
+
+    
+    await Trash.update(
+      {
+        is_trash_pay: paidType.PAID,
+        trash_pay_amount: trash_price.value,
+        pay_by:validatedResult.pay_by,
+        operate_by:req.user.id,
+        proof_of_payment:payment.id
+      },
+      {
+        where: {
+          id: eachTrashPay
+        },
+        transaction: t,
+      }
+    );
+    
+
+    
+    await PaymentDetail.create({
+      name: payment_detail_enum.TRASH.LA +
+      "ວັນທີ " +(date.format(date.addDays(date.parse(trash_detail.rentingdetail.end_date, "YYYY-MM-DD"),-30), "YYYY-MM-DD")).toString()+" - "+
+      date.format(date.parse(trash_detail.rentingdetail.end_date, "YYYY-MM-DD"),"YYYY-MM-DD").toString(),
+      price:trash_price.value,
+      type:payment_detail_enum.TRASH.EN,
+      payment_id:payment.id
+    },{
+      transaction: t
+    });
+    totalPrice+=parseInt(trash_price.value);
+ 
+  }
+}
+    //end trash
+
+
+/////////
+//////////
+/////////
+//////
+///////
+////
+
+// start renting detail
+
+if(validatedResult.renting_pay){
+
+for (let eachRenitngDetail of validatedResult.renting_pay) {
+  const renting_detail = await RentingDetail.findOne({
+    where: {
+      id: eachRenitngDetail.renting_detail_id,
+    },
+    include: [{model:Renting,include:[{model:Room,include:Type}]}],
+  });
+
+  let roomPrice = renting_detail.Renting.Room.Type.price;
+
+  
+
+  if (!renting_detail)
+    throw createHttpError.NotFound("No renting detail found");
+
+
+    await RentingDetail.update(
+      {
+        is_renting_pay: paidType.PAID,
+        renting_pay_amount: roomPrice,
+        proof_of_payment: payment_no,
+        fine: typeof eachRenitngDetail.fine=="undefined"?0:eachRenitngDetail.fine,
+        pay_by: validatedResult.pay_by,
+        operate_by: req.user.id,
+      },
+      {
+        where: {
+          id: renting_detail.id,
+        },
+        transaction: t,
+      }
+    );
+
+    await PaymentDetail.create(
+      {
+        name:
+          payment_detail_enum.RENTING.LA +
+          "ວັນທີ " +
+          date
+            .format(
+              date.addDays(
+                date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                -30
+              ),
+              "YYYY-MM-DD"
+            )
+            .toString() +
+          " - " +
+          date.format(
+            date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+            "YYYY-MM-DD"
+          ),
+        price: roomPrice,
+        type: payment_detail_enum.RENTING.EN,
+        payment_id: payment.id,
+      },
+      {
+        transaction: t,
+      }
+    );
+
+    totalPrice += parseInt(roomPrice);
+  
+
+
+  if (typeof eachRenitngDetail.fine !=="undefined"&&parseInt(eachRenitngDetail.fine) != 0) {
+    await PaymentDetail.create(
+      {
+        name:
+          payment_detail_enum.FINE.LA +
+          "ວັນທີ " +
+          date
+            .format(
+              date.addDays(
+                date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+                -30
+              ),
+              "YYYY-MM-DD"
+            )
+            .toString() +
+          " - " +
+          date
+            .format(
+              date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+              "YYYY-MM-DD"
+            )
+            .toString(),
+        price: eachRenitngDetail.fine,
+        type: payment_detail_enum.FINE.EN,
+        payment_id: payment.id,
+      },
+      {
+        transaction: t,
+      }
+    );
+    totalPrice += parseInt(eachRenitngDetail.fine);
+  }
+
+  if (
+    date.isSameDay(
+      date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+      date.parse(renting_detail.Renting.end_renting_date, "YYYY-MM-DD")
+    ) 
+  ) {
+    if (renting_detail.Renting.active == 0) {
+      throw createHttpError(400, "this renting is already checkout");
+    }
+
+    let newRentingId = await RentingDetail.create(
+      {
+        renting_id: renting_detail.Renting.id,
+        start_date: date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+
+        end_date: date.addDays(
+          date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+          1 * 30
+        ),
+        is_renting_pay: paidType.UNPAID,
+      },
+      {
+        transaction: t,
+      }
+    );
+
+    await Renting.update(
+      {
+        end_renting_date: date.addDays(
+          date.parse(renting_detail.end_date, "YYYY-MM-DD"),
+          30 * 1
+        ),
+      },
+      {
+        where: {
+          id: renting_detail.Renting.id,
+        },
+        transaction: t,
+      }
+    );
+
+    await Trash.create(
+      {
+        rentingdetail_id: newRentingId.id,
+        is_trash_pay: paidType.UNPAID,
+      },
+      {
+        transaction: t,
+      }
+    );
+  }
+}
+}
+////
+    await Payment.update({
+      total:totalPrice,
+      payment_no:payment_no
+    },{
+      where:{
+        id:payment.id
+      },
+      transaction:t
+    });
+
+    await t.commit();
+
+    let responsePayment = await Payment.findOne({
+      where:{
+        id:payment.id
+      },
+      include:[PaymentDetail,"payBy","operateBy"]
+    });
+    return res.status(200).json({
+      data: [],
+      message: "Bill has been paid successfully",
+      success: true,
+      payment_information:responsePayment
+    });
+  } catch (err) {
+    await t.rollback();
+    next(err);
+  }
+}

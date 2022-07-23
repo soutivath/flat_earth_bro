@@ -49,3 +49,16 @@ export const removePeopleSchema = Joi.object({
   renting_id: Joi.number().integer().required(),
   users_renting: Joi.array().items(Joi.number().integer()).required(),
 });
+
+
+export const multipay = Joi.object({
+  renting_pay : Joi.array().items(
+    Joi.object({
+      renting_detail_id:Joi.number().integer(),
+      fine:Joi.number().integer()
+    })
+  ),
+  trash_pay_id:Joi.array().items(Joi.number().integer()),
+  bill_pay_id:Joi.array().items(Joi.number().integer()),
+  pay_by:Joi.number().integer().required(),
+});
