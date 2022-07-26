@@ -1848,6 +1848,7 @@ exports.checkOut = async (req, res, next) => {
 
     await Room.update(
       {
+        end_renting_date:nowDate,
         is_active: false,
       },
       {
