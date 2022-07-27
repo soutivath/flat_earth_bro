@@ -415,7 +415,7 @@ if (!user) {
           } else {
             await Trash.create(
               {
-                renting_id: renting.id,
+                renting_id: rentingID.id,
                 is_trash_pay: paidType.UNPAID,
                
               },
@@ -1848,7 +1848,6 @@ exports.checkOut = async (req, res, next) => {
 
     await Room.update(
       {
-        end_renting_date:nowDate,
         is_active: false,
       },
       {
