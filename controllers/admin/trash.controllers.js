@@ -67,7 +67,6 @@ exports.payTrash = async (req, res, next) => {
   let payment_no = payment.id.toString().padStart(10, "0");
     //let allTrashPrice = getTrashPrice() * amountOfPeople;
 
-    throw createHttpError("nice");
 
    // let allTrashPrice = parseInt(trash_price) * amountOfPeople;
    for(let eachTrashPay of validationResult.trash_pay_id){
