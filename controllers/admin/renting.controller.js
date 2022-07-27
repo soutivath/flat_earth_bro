@@ -181,6 +181,7 @@ if (!user) {
       );
       totalPrice += parseInt(roomPrice);
 
+
       if (validateResult.trash_pay) {
         await Trash.create(
           {
@@ -241,8 +242,6 @@ if (!user) {
           {
             rentingdetail_id: rentingID.id,
             is_trash_pay: paidType.UNPAID,
-            
-            
           },
           {
             transaction: t,
@@ -250,6 +249,8 @@ if (!user) {
         );
       }
     }
+
+   
 
     if (validateResult.renting_months <= 0) {
       nextDate = date.addDays(nextDate, 30 * 1);
@@ -299,7 +300,7 @@ if (!user) {
               transaction: t,
             }
           );
-
+        
           await Trash.create(
             {
               rentingdetail_id: rentingID.id,
@@ -415,7 +416,7 @@ if (!user) {
           } else {
             await Trash.create(
               {
-                renting_id: rentingID.id,
+                rentingdetail_id: rentingID.id,
                 is_trash_pay: paidType.UNPAID,
                
               },
