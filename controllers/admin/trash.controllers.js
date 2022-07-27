@@ -25,6 +25,7 @@ exports.payTrash = async (req, res, next) => {
   const t = await sequelize.transaction();
 
   try {
+    throw createHttpError("nice");
     const validationResult = await payTrashSchema.validateAsync(req.body);
 
    let total= 0;
@@ -53,7 +54,7 @@ exports.payTrash = async (req, res, next) => {
         name:"trash_price"
       }
   });
-
+  throw createHttpError("nice");
 
   let payment = await Payment.create({
     pay_by: validationResult.pay_by,
