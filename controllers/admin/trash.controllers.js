@@ -54,7 +54,7 @@ exports.payTrash = async (req, res, next) => {
         name:"trash_price"
       }
   });
-  throw createHttpError("nice");
+
 
   let payment = await Payment.create({
     pay_by: validationResult.pay_by,
