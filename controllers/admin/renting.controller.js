@@ -752,7 +752,7 @@ exports.payRent = async (req, res, next) => {
           {
             is_renting_pay: paidType.PAID,
             renting_pay_amount: roomPrice,
-            proof_of_payment: payment_no,
+            proof_of_payment: payment.id,
             fine: typeof eachRenitngDetail.fine=="undefined"?0:eachRenitngDetail.fine,
             pay_by: validateResult.renting_pay_by,
             operate_by: req.user.id,
@@ -801,7 +801,7 @@ exports.payRent = async (req, res, next) => {
           {
             is_trash_pay: paidType.PAID,
             trash_pay_amount: allTrashPrice,
-            proof_of_payment: payment_no,
+            proof_of_payment: payment.id,
             pay_by:validateResult.renting_pay_by,
             operate_by:req.user.id
           },
@@ -989,7 +989,7 @@ exports.payRent = async (req, res, next) => {
               renting_pay_amount: roomPrice,
               pay_by: validateResult.renting_pay_by,
               operate_by: req.user.id,
-              proof_of_payment: payment_no,
+              proof_of_payment: payment.id,
               fine: 0,
             },
             {
