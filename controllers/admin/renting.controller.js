@@ -82,6 +82,14 @@ exports.checkIn = async (req, res, next) => {
 
     let trash_price = trash_settings.value;
 
+    let deposit_setting = await Setting.findOne({
+      where:{
+        name:"deposit"
+      }
+    });
+
+    let deposit_price = deposit_setting.value;
+
     const renting = await Renting.create(
       {
         room_id: validateResult.room_id,
@@ -114,6 +122,43 @@ user = await User.findByPk(validateResult.renting_pay_by);
 if (!user) {
   throw createHttpError(404, "user not found");
 }
+
+if(newPaymentData==null){
+  newPaymentData = await Payment.create(
+   {
+     pay_by: validateResult.renting_pay_by,
+     total: totalPrice,
+     renting_id: renting.id,
+     operate_by: req.user.id,
+     pay_date: date.format(new Date(), "YYYY-MM-DD HH:mm:ss"),
+   },
+   {
+     transaction: t,
+   }
+ );
+  newPaymentDataNo = newPaymentData.id.toString().padStart(10, "0");
+}
+
+//deposit
+await PaymentDetail.create(
+  {
+    name:"ຄ່າມັດຈຳ",
+    price: deposit_price,
+    type: payment_detail_enum.RENTING.EN,
+    payment_id: newPaymentData.id,
+  },
+  {
+    transaction: t,
+  }
+);
+totalPrice += parseInt(deposit_price);
+
+
+
+///
+
+
+
     if (validateResult.renting_pay) {
     //  rentingDetailOption.renting_pay_amount = room.Type.price;
       if (validateResult.renting_pay_by) {
