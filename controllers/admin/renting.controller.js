@@ -1447,29 +1447,29 @@ exports.checkOut = async (req, res, next) => {
 
         
           if (eachUnpaid.Trash.is_trash_pay == paidType.UNPAID) {
-            if (checkout_payment == null) {
-              checkout_payment = await Payment.create(
-                {
-                  pay_by: validationResult.renting_pay_by,
-                  renting_id: renting.id,
-                  operate_by: req.user.id,
-                  pay_date:new Date(),
-                },
-                {
-                  transaction: t,
-                }
-              );
+            // if (checkout_payment == null) {
+            //   checkout_payment = await Payment.create(
+            //     {
+            //       pay_by: validationResult.renting_pay_by,
+            //       renting_id: renting.id,
+            //       operate_by: req.user.id,
+            //       pay_date:new Date(),
+            //     },
+            //     {
+            //       transaction: t,
+            //     }
+            //   );
 
-              checkout_no = checkout_payment.id.toString().padStart(10, "0");
-            }
+            //   checkout_no = checkout_payment.id.toString().padStart(10, "0");
+            // }
               
                 await Trash.update(
                 {
-                  is_trash_pay: paidType.PAID,
-                  trash_pay_amount: validationResult.trash_amount,
-                  proof_of_payment: checkout_payment.id,
-                  pay_by: validationResult.renting_pay_by,
-                  operate_by: req.user.id,
+                  is_trash_pay: paidType.PASS,
+                 // trash_pay_amount: validationResult.trash_amount,
+                //  proof_of_payment: checkout_payment.id,
+              //    pay_by: validationResult.renting_pay_by,
+                //  operate_by: req.user.id,
                 },
                 {
                   where: {
@@ -1480,47 +1480,47 @@ exports.checkOut = async (req, res, next) => {
               );
            
 
-              total+= parseInt(validationResult.trash_amount);
+              // total+= parseInt(validationResult.trash_amount);
 
-              await Renting.update(
-                {
-                  end_renting_date: nowDate,
-                },
-                {
-                  where: {
-                    id: renting.id,
-                  },
-                  transaction: t,
-                }
-              );
+              // await Renting.update(
+              //   {
+              //     end_renting_date: nowDate,
+              //   },
+              //   {
+              //     where: {
+              //       id: renting.id,
+              //     },
+              //     transaction: t,
+              //   }
+              // );
 
-              await PaymentDetail.create(
-                {
-                  name:
-                    "ຈ່າຍຄ່າຂີ້ເຫຍື້ອ ແລະ " +
-                    payment_detail_enum.CHECKOUT.LA +
-                    "ວັນທີ " +
-                    date
-                      .format(
-                        date.addDays(
-                          date.parse(eachUnpaid.end_date, "YYYY-MM-DD"),
-                          -30
-                        ),
-                        "YYYY-MM-DD"
-                      )
-                      .toString() +
-                    " - " +
-                    date
-                      .format(date.parse(nowDate, "YYYY-MM-DD"), "YYYY-MM-DD")
-                      .toString(),
-                  price: validationResult.trash_amount,
-                  type: payment_detail_enum.CHECKOUT.EN,
-                  payment_id: checkout_payment.id,
-                },
-                {
-                  transaction: t,
-                }
-              );
+              // await PaymentDetail.create(
+              //   {
+              //     name:
+              //       "ຈ່າຍຄ່າຂີ້ເຫຍື້ອ ແລະ " +
+              //       payment_detail_enum.CHECKOUT.LA +
+              //       "ວັນທີ " +
+              //       date
+              //         .format(
+              //           date.addDays(
+              //             date.parse(eachUnpaid.end_date, "YYYY-MM-DD"),
+              //             -30
+              //           ),
+              //           "YYYY-MM-DD"
+              //         )
+              //         .toString() +
+              //       " - " +
+              //       date
+              //         .format(date.parse(nowDate, "YYYY-MM-DD"), "YYYY-MM-DD")
+              //         .toString(),
+              //     price: validationResult.trash_amount,
+              //     type: payment_detail_enum.CHECKOUT.EN,
+              //     payment_id: checkout_payment.id,
+              //   },
+              //   {
+              //     transaction: t,
+              //   }
+              // );
             
           }
      
