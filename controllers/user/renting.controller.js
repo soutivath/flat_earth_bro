@@ -195,44 +195,41 @@ exports.getRentingStatus = async (req,res,next)=>{
             });
           }
 
-
-
-          const rentingDetailData = await RentingDetail.findAll({
-            where:{
-                renting_id:renting_id,
-                end_date:{
-                    [Op.lte]:new Date()
-                },
-            },
-            include:Trash,
-            order: [["end_date", "DESC"]],
-           });
-          for (let eachData of rentingDetailData){
-            if(eachData.is_renting_pay==paidType.UNPAID){
-                rentingStatus = true;
-            }
-    
-            if(eachData.Trash.is_trash_pay == paidType.UNPAID){
-                trashStatus = true;
-            }
-          }
-    
-          const billData = await Bill.findAll({
-            where:{
-                renting_id:renting_id,
-                is_pay:paidType.UNPAID
-            }
-          });
-    
-          if(billData[0]){
-            billStatus = true;
-          }
           await t.commit();
 
 
 
 
-      
+       const rentingDetailData = await RentingDetail.findAll({
+        where:{
+            renting_id:renting_id,
+            end_date:{
+                [Op.lte]:new Date()
+            },
+        },
+        include:Trash,
+        order: [["end_date", "DESC"]],
+       });
+      for (let eachData of rentingDetailData){
+        if(eachData.is_renting_pay==paidType.UNPAID){
+            rentingStatus = true;
+        }
+
+        if(eachData.Trash.is_trash_pay == paidType.UNPAID){
+            trashStatus = true;
+        }
+      }
+
+      const billData = await Bill.findAll({
+        where:{
+            renting_id:renting_id,
+            is_pay:paidType.UNPAID
+        }
+      });
+
+      if(billData[0]){
+        billStatus = true;
+      }
 
       return res.status(200).json({
         data:{
