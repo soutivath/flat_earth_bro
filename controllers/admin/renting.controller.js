@@ -2663,3 +2663,43 @@ for (let eachRenitngDetail of validatedResult.renting_pay) {
     next(err);
   }
 }
+
+exports.getSignContractData = async (req,res,next)=>{
+  try{
+    const renting_id = req.params.id;
+    const renting = await Renting.findOne({
+      where:{
+        id:renting_id
+      },
+      include:["staff",User,UserRenting]
+    });
+
+    if(!renting){
+      throw createHttpError(404,"Renting not found");
+    }
+
+    let userCount = renting.UserRentings.length;
+
+    let superadminData = await User.findOne({where:{id:1}});
+
+    let contract_data ={
+      superadmin:superadminData,
+      staff_name : renting.staff.name,
+      staff_surname: renting.staff.surname,
+      staff_personal_card_no : renting.staff.personal_card_no,
+      user_name : renting.User.name,
+      user_surname : renting.User.surname,
+      user_personal_card : renting.User.personal_card_no,
+      people_count : userCount,
+      contract_date :renting.start_renting_date
+    }
+    return res.status(200).json({
+      success : true,
+      data:renting,
+      payment_information:null,
+      contract_data:contract_data
+    });
+  }catch(err){
+    next(err);
+  }
+}

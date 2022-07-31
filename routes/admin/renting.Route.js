@@ -23,6 +23,8 @@ router.post("/addProofOfPayment/:id",(proofOfPaymentUpload.array("proof_image",1
 
 router.post('/multi-pay',(upload.any()),renting.payMultiBill);
 
+router.get('/get-contract-data/:id',renting.getSignContractData);
+
 export default router;
 
 
