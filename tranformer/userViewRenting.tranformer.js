@@ -21,6 +21,7 @@ exports.viewRentingWithDetail = async (data) => {
   let room = data.Renting.Room;
  let type = data.Renting.Room.Type;
   return {
+    contract_path:renting.contract_path,
     renting_id: renting.id,
     start_renting_date: renting.start_renting_date,
     end_renting_date: renting.end_renting_date,
