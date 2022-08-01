@@ -6,8 +6,8 @@ export const postEditAdminSchema = Joi.object({
     "dob":Joi.date().required(),
     "phoneNumber":Joi.string().length(14).required(),
     "is_admin":Joi.string().valid(...Object.values(["user","admin","superadmin"])).required(),
-    "personal_card_no":Joi.string().required()
-    
+    "personal_card_no":Joi.string().required(),
+    "gender":Joi.string().valid(...Object.values(["ທ້າວ","ນາງ"])).required(),
     //"phoneNumber":Joi.string().min(6).length(8).required(),
   //  "password":Joi.string().required(),
 
@@ -18,6 +18,7 @@ export const addUserSchema = Joi.object({
     "surname":Joi.string().required(),
     "dob":Joi.date().required(),
   //  "password":Joi.string().required(),
+  "gender":Joi.string().valid(...Object.values(["ທ້າວ","ນາງ"])).required(),
     "phoneNumber":Joi.string().required(),
     "is_admin":Joi.string().valid(...Object.values(["user","admin","superadmin"])).required(),
     "personal_card_no":Joi.string().required()

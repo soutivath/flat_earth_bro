@@ -33,6 +33,9 @@ module.exports = {
       personal_card_no:{
         type:Sequelize.STRING,
       },
+      gender:{
+        type:Sequelize.ENUM("ທ້າວ","ນາງ"),
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

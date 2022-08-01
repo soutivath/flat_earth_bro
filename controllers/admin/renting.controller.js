@@ -650,6 +650,7 @@ totalPrice += parseInt(deposit_price);
         user_name : user.name,
         user_surname : user.surname,
         user_personal_card : user.personal_card_no,
+        user_gender:user.gender,
         people_count : validateResult.users_renting.length,
         contract_date : date.format(validateResult.start_renting,"YYYY-MM-DD")
       },
@@ -674,6 +675,7 @@ totalPrice += parseInt(deposit_price);
         user_name : user.name,
         user_surname : user.surname,
         user_personal_card : user.personal_card_no,
+        user_gender:user.gender,
         people_count : validateResult.users_renting.length,
         contract_date : date.format(validateResult.start_renting,"YYYY-MM-DD")
       }
@@ -2690,6 +2692,7 @@ exports.getSignContractData = async (req,res,next)=>{
       user_name : renting.User.name,
       user_surname : renting.User.surname,
       user_personal_card : renting.User.personal_card_no,
+      user_gender:renting.User.gender,
       people_count : userCount,
       contract_date :renting.start_renting_date
     }

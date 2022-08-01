@@ -14,13 +14,14 @@ module.exports = {
     */
 
      let superadmin = await queryInterface.bulkInsert('users',[{
-      name:"Super Admin",
-      surname:"surname admin",
+      name:"ຄຳໃສ",
+      surname:"ສົມພົງ",
       dob:"2000-12-20",
       phoneNumber:"+8562011111111",
       image:"default_profile.png",
       is_admin:"superadmin",
       personal_card_no:"1111111111",
+      gender:"ທ້າວ",
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

@@ -59,6 +59,7 @@ exports.editUser = async (req, res, next) => {
     option.phoneNumber = validatedResult.phoneNumber;
     option.is_admin = validatedResult.is_admin;
     option.personal_card_no = validatedResult.personal_card_no;
+    option.gender = validatedResult.gender;
 
     if (req.files[0]) {
       option.image = req.files[0].filename;
@@ -132,7 +133,8 @@ exports.addAdmin = async (req, res, next) => {
         phoneNumber: validatedResult.phoneNumber,
         image: imageProfile,
         is_admin: validatedResult.is_admin,
-        personal_card_no: validatedResult.personal_card_no
+        personal_card_no: validatedResult.personal_card_no,
+        gender:validatedResult.gender
       },
       {
         transaction: t,

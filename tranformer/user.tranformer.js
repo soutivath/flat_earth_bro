@@ -20,6 +20,7 @@ exports.userTranformer = (data)=>{
             notification_topic: user.notification_topic,
             firebase_uid: user.firebase_uid,
             personal_card_no:user.personal_card_no,
+            gender:user.gender,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
             Account:{

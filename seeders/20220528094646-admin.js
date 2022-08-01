@@ -25,6 +25,7 @@ module.exports = {
       image:"default_profile.png",
       is_admin:"admin",
       personal_card_no:"2222222222",
+      gender:"ທ້າວ",
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

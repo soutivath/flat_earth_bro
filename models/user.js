@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     image:DataTypes.STRING,
     is_admin: DataTypes.ENUM("superadmin","admin","user"),
     personal_card_no:DataTypes.STRING,
-  
+    gender:DataTypes.ENUM("ທ້າວ","ນາງ"),
   }, {
     sequelize,
     modelName: 'User',

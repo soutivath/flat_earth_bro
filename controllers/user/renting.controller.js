@@ -193,11 +193,9 @@ exports.getRentingStatus = async (req,res,next)=>{
               },
               transaction:t
             });
-          }
+        }
 
-          await t.commit();
-
-
+        await t.commit();
 
 
        const rentingDetailData = await RentingDetail.findAll({

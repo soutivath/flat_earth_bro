@@ -36,6 +36,7 @@ let user3 = await queryInterface.bulkInsert('users',[{
   image:"default_profile.png",
   is_admin:"user",
   personal_card_no:"3333333333",
+  gender:"ນາງ",
   createdAt: new Date(),
   updatedAt: new Date()
 }]);
@@ -62,6 +63,7 @@ let user4 = await queryInterface.bulkInsert('users',[{
   image:"default_profile.png",
   is_admin:"user",
   personal_card_no:"4444444444",
+  gender:"ທ້າວ",
   createdAt: new Date(),
   updatedAt: new Date()
 }]);
@@ -87,6 +89,7 @@ let user5 = await queryInterface.bulkInsert('users',[{
   image:"default_profile.png",
   is_admin:"user",
   personal_card_no:"5555555555",
+  gender:"ນາງ",
   createdAt: new Date(),
   updatedAt: new Date()
 }]);
@@ -113,6 +116,7 @@ let user6 = await queryInterface.bulkInsert('users',[{
   image:"default_profile.png",
   is_admin:"user",
   personal_card_no:"6666666666",
+  gender:"ທ້າວ",
   createdAt: new Date(),
   updatedAt: new Date()
 }]);
