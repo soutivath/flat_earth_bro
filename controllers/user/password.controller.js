@@ -5,6 +5,7 @@ import {User,sequelize,Account} from "../../models/";
 import { hashPassword, compareHashPassword } from "../../libs/utils/bcrypt";
 exports.resetPassword = async (req, res, next) => {
     try {
+  
       const body = req.body;
       // if(!body.old_password){
       //   throw createHttpError.BadRequest("old_password is required");
