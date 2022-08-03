@@ -195,6 +195,9 @@ exports.login = async (req, res, next) => {
       user.Account.password
     );
 
+    return res.status(200).json({
+      data:user.Account.fcm
+    })
     if(user.is_admin=="user"){
      if(user.Account.personal_option){
       admin

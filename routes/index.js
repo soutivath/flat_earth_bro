@@ -43,7 +43,7 @@ import {isSuperAdmin} from '../middlewares/isSuperAdmin.guard';
 
  const app = express();
 
- app.use("/user",resetPassword);
+app.use("/user",resetPassword);
  
 app.use("/admin",authRouteAdmin);
 app.use("/admin",[Auth,isAdmin],billRouteAdmin);
