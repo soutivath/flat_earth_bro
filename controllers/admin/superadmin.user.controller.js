@@ -182,7 +182,13 @@ exports.deleteUser = async (req, res, next) => {
       throw createHttpError(403, "permission denied");
     }
 
-    const userImagePath = user.getProfilePath();
+  
+    const profileName = user.image;
+    let userImagePath = "";
+    if(profileName!="default_profile.jpg"){
+      userImagePath = user.getProfilePath();
+    }
+ 
 
     
 
@@ -198,7 +204,10 @@ exports.deleteUser = async (req, res, next) => {
       transaction: t,
     });
     try {
-      fs.unlinkSync(userImagePath);
+      if(profileName!="default_profile.jpg"){
+        fs.unlinkSync(userImagePath);
+      }
+      
     } catch (err) {}
     await t.commit();
     return res.status(200).json({
