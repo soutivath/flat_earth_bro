@@ -170,6 +170,7 @@ exports.addAdmin = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
+
     const userId = req.params.id;
     if(req.user.user_id == userId){
     
@@ -183,10 +184,12 @@ exports.deleteUser = async (req, res, next) => {
 
     const userImagePath = user.getProfilePath();
 
+    
+
     await Account.destroy({
       where:{
         user_id:userId,
-      }
+      },
     },{
       transaction: t,
     });

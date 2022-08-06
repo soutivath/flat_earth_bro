@@ -107,6 +107,7 @@ import {userTranformer} from "../../tranformer/user.tranformer";
 // }
 
 exports.deleteUser = async (req,res,next)=>{
+    
     try{
         const userId = req.params.id;
         // if(req.user.id == userId){
