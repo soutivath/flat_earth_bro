@@ -182,7 +182,7 @@ exports.getUser = async (req,res,next)=>{
             where:option,
             include:Account
         });
-        return res.status(200).json({data:userData});
+    
         const tranformedData = userTranformer(userData);
         return res.status(200).json({data:tranformedData,message:"get data successfully",success:true});
      

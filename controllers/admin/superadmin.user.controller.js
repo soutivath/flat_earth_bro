@@ -185,7 +185,7 @@ exports.deleteUser = async (req, res, next) => {
   
     const profileName = user.image;
     let userImagePath = "";
-    if(profileName!="default_profile.jpg"){
+    if(profileName!="default_profile.png"){
       userImagePath = user.getProfilePath();
     }
  
